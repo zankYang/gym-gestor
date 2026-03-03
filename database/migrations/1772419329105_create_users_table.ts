@@ -27,7 +27,7 @@ export default class extends BaseSchema {
 
       table.unique(['gym_id', 'email'])
 
-      table.check(`role in ('admin', 'receptionist', 'trainer')`)
+      table.check(`role in ('super_admin', 'admin', 'receptionist', 'trainer')`)
       table.check(`status in ('active', 'inactive')`)
     })
 

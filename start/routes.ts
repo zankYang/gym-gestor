@@ -19,6 +19,13 @@ router
   .group(() => {
     router
       .group(() => {
+        router.post('gyms', [controllers.admin.CreateGym, 'store'])
+      })
+      .prefix('/admin')
+      .as('admin')
+      .use(middleware.auth())
+    router
+      .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
         router.post('login', [controllers.AccessToken, 'store'])
         router.post('logout', [controllers.AccessToken, 'destroy']).use(middleware.auth())
