@@ -7,11 +7,18 @@ export const controllers = {
   AccessToken: () => import('#controllers/access_token_controller'),
   admin: {
     CreateGym: () => import('#controllers/admin/create_gym_controller'),
+    DestroyGym: () => import('#controllers/admin/destroy_gym_controller'),
     ListGyms: () => import('#controllers/admin/list_gyms_controller'),
     UpdateGym: () => import('#controllers/admin/update_gym_controller'),
-    DestroyGym: () => import('#controllers/admin/destroy_gym_controller'),
   },
   NewAccount: () => import('#controllers/new_account_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Testing: () => import('#controllers/testing_controller'),
+  user: {
+    CreateUser: () => import('#controllers/user/create_user_controller'),
+    DestroyUser: () => import('#controllers/user/destroy_user_controller'),
+    ListUsers: () => import('#controllers/user/list_users_controller'),
+    ShowUser: () => import('#controllers/user/show_user_controller'),
+    UpdateUser: () => import('#controllers/user/update_user_controller'),
+  },
 }

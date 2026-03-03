@@ -1,18 +1,30 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import User from '#models/user'
-import Gym from '#models/gym'
+import hash from '@adonisjs/core/services/hash'
+import { CommandOptions } from '@adonisjs/core/types/ace'
 
 export default class CreateSuperadmin extends BaseCommand {
   static commandName = 'create:superadmin'
   static description = 'Crear un usuario con rol superadmin (solo para uso inicial o recuperación)'
+  static options: CommandOptions = {
+    startApp: true,
+  }
 
-  @flags.string({ description: 'Email del superadmin' })
+  @flags.string({
+    description: 'Email del superadmin',
+    alias: 'e',
+    default: 'superadmin@gymgestor.com',
+  })
   declare email: string
 
-  @flags.string({ description: 'Nombre completo' })
+  @flags.string({ description: 'Nombre completo', alias: 'n', default: 'superadmin' })
   declare fullName: string
 
-  @flags.string({ description: 'Contraseña (mínimo 8 caracteres)' })
+  @flags.string({
+    description: 'Contraseña (mínimo 8 caracteres)',
+    alias: 'p',
+    default: 'admin2026',
+  })
   declare password: string
 
   async run() {
@@ -32,25 +44,20 @@ export default class CreateSuperadmin extends BaseCommand {
       return
     }
 
-    const gym = await Gym.notDeleted().select('id').first()
-    if (!gym) {
-      this.logger.error('No hay ningún gym en la base de datos. Crea uno antes (seeders o API).')
+    const existing = await User.query().whereNull('gym_id').where('email', this.email).first()
+    if (existing) {
+      this.logger.error(`Ya existe un superadmin con el email "${this.email}".`)
       this.exitCode = 1
       return
     }
 
-    const existing = await User.query().where('email', this.email).first()
-    if (existing) {
-      this.logger.error(`Ya existe un usuario con el email "${this.email}".`)
-      this.exitCode = 1
-      return
-    }
+    const password = await hash.make(this.password)
 
     const user = await User.create({
-      gymId: gym!.id,
+      gymId: null,
       fullName: this.fullName.trim(),
       email: this.email.trim(),
-      password: this.password,
+      password,
       role: 'superadmin',
       status: 'active',
     })

@@ -29,6 +29,17 @@ router
       .use([middleware.auth(), middleware.superadmin()])
     router
       .group(() => {
+        router.get('/', [controllers.user.ListUsers, 'index'])
+        router.post('/', [controllers.user.CreateUser, 'store'])
+        router.get('/:id', [controllers.user.ShowUser, 'show'])
+        router.patch('/:id', [controllers.user.UpdateUser, 'update'])
+        router.delete('/:id', [controllers.user.DestroyUser, 'destroy'])
+      })
+      .prefix('/users')
+      .as('users')
+      .use([middleware.auth(), middleware.superadmin()])
+    router
+      .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
         router.post('login', [controllers.AccessToken, 'store'])
         router.post('logout', [controllers.AccessToken, 'destroy']).use(middleware.auth())
