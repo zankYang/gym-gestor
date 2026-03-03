@@ -24,10 +24,11 @@ export default class extends BaseSchema {
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
+      table.timestamp('deleted_at', { useTz: true }).nullable()
 
       table.unique(['gym_id', 'email'])
 
-      table.check(`role in ('super_admin', 'admin', 'receptionist', 'trainer')`)
+      table.check(`role in ('superadmin', 'admin', 'receptionist', 'trainer')`)
       table.check(`status in ('active', 'inactive')`)
     })
 

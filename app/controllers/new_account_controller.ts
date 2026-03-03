@@ -1,20 +1,20 @@
 import User from '#models/user'
+import Gym from '#models/gym'
 import { signupValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import UserTransformer from '#transformers/user_transformer'
-import db from '@adonisjs/lucid/services/db'
 
 export default class NewAccountController {
   async store({ request, serialize }: HttpContext) {
     const { fullName, email, password } = await request.validateUsing(signupValidator)
 
-    const gym = await db.connection().from('gyms').select('id').first()
+    const gym = await Gym.notDeleted().select('id').first()
     if (!gym) {
       throw new Error('No gym available for registration')
     }
 
     const user = await User.create({
-      gymId: gym.id,
+      gymId: gym!.id,
       fullName,
       email,
       password,

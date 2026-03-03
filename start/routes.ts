@@ -19,11 +19,14 @@ router
   .group(() => {
     router
       .group(() => {
+        router.get('gyms', [controllers.admin.ListGyms, 'index'])
         router.post('gyms', [controllers.admin.CreateGym, 'store'])
+        router.patch('gyms/:id', [controllers.admin.UpdateGym, 'update'])
+        router.delete('gyms/:id', [controllers.admin.DestroyGym, 'destroy'])
       })
       .prefix('/admin')
       .as('admin')
-      .use(middleware.auth())
+      .use([middleware.auth(), middleware.superadmin()])
     router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
