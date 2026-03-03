@@ -1,6 +1,9 @@
 import { UserSchema } from '#database/schema'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import hash from '@adonisjs/core/services/hash'
+import { belongsTo } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import Gym from '#models/gym'
 
 export default class User extends UserSchema {
   static verifyCredentials = async (email: string, password: string) => {
@@ -16,4 +19,7 @@ export default class User extends UserSchema {
   }
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
+
+  @belongsTo(() => Gym)
+  declare gym: BelongsTo<typeof Gym>
 }

@@ -8,7 +8,17 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AttendanceSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'clientId', 'membershipId', 'checkIn', 'checkOut', 'accessGranted', 'notes', 'createdAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'clientId',
+    'membershipId',
+    'checkIn',
+    'checkOut',
+    'accessGranted',
+    'notes',
+    'createdAt',
+  ] as const
   $columns = AttendanceSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
@@ -30,8 +40,59 @@ export class AttendanceSchema extends BaseModel {
   declare createdAt: DateTime
 }
 
+export class AuthAccessTokenSchema extends BaseModel {
+  static $columns = [
+    'id',
+    'tokenableId',
+    'type',
+    'name',
+    'hash',
+    'abilities',
+    'createdAt',
+    'updatedAt',
+    'lastUsedAt',
+    'expiresAt',
+  ] as const
+  $columns = AuthAccessTokenSchema.$columns
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column()
+  declare tokenableId: bigint | number
+  @column()
+  declare type: string
+  @column()
+  declare name: string | null
+  @column()
+  declare hash: string
+  @column()
+  declare abilities: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+}
+
 export class ClientSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'fullName', 'phone', 'email', 'birthDate', 'gender', 'address', 'emergencyContactName', 'emergencyContactPhone', 'notes', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'fullName',
+    'phone',
+    'email',
+    'birthDate',
+    'gender',
+    'address',
+    'emergencyContactName',
+    'emergencyContactPhone',
+    'notes',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = ClientSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
@@ -64,7 +125,21 @@ export class ClientSchema extends BaseModel {
 }
 
 export class GymSchema extends BaseModel {
-  static $columns = ['id', 'name', 'slug', 'logoUrl', 'primaryColor', 'secondaryColor', 'accentColor', 'email', 'phone', 'address', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'name',
+    'slug',
+    'logoUrl',
+    'primaryColor',
+    'secondaryColor',
+    'accentColor',
+    'email',
+    'phone',
+    'address',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = GymSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -95,7 +170,21 @@ export class GymSchema extends BaseModel {
 }
 
 export class MembershipSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'clientId', 'planId', 'startDate', 'endDate', 'finalPrice', 'status', 'paymentStatus', 'notes', 'createdBy', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'clientId',
+    'planId',
+    'startDate',
+    'endDate',
+    'finalPrice',
+    'status',
+    'paymentStatus',
+    'notes',
+    'createdBy',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = MembershipSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
@@ -126,7 +215,20 @@ export class MembershipSchema extends BaseModel {
 }
 
 export class PaymentSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'membershipId', 'clientId', 'amount', 'paymentDate', 'paymentMethod', 'reference', 'notes', 'receivedBy', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'membershipId',
+    'clientId',
+    'amount',
+    'paymentDate',
+    'paymentMethod',
+    'reference',
+    'notes',
+    'receivedBy',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = PaymentSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
@@ -155,7 +257,18 @@ export class PaymentSchema extends BaseModel {
 }
 
 export class PlanSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'name', 'description', 'planType', 'durationDays', 'price', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'name',
+    'description',
+    'planType',
+    'durationDays',
+    'price',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = PlanSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
@@ -180,7 +293,17 @@ export class PlanSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['id', 'gymId', 'fullName', 'email', 'password', 'role', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'gymId',
+    'fullName',
+    'email',
+    'password',
+    'role',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column({ isPrimary: true })
   declare id: bigint | number
