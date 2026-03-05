@@ -1,14 +1,15 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-
+import { Status } from '#enums/status_enum'
+import { PaymentStatus } from '#enums/payment_status_enum'
 export default class extends BaseSchema {
   protected tableName = 'memberships'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigIncrements('id').primary()
+      table.increments('id').primary()
 
       table
-        .bigInteger('gym_id')
+        .integer('gym_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -16,27 +17,27 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
 
       table
-        .bigInteger('client_id')
+        .integer('client_id')
         .unsigned()
         .notNullable()
         .references('id')
         .inTable('clients')
         .onDelete('CASCADE')
 
-      table.bigInteger('plan_id').unsigned().notNullable().references('id').inTable('plans')
+      table.integer('plan_id').unsigned().notNullable().references('id').inTable('plans')
 
       table.date('start_date').notNullable()
       table.date('end_date').notNullable()
 
       table.decimal('final_price', 10, 2).notNullable()
 
-      table.string('status', 20).notNullable().defaultTo('active')
-      table.string('payment_status', 20).notNullable().defaultTo('pending')
+      table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
+      table.string('payment_status', 20).notNullable().defaultTo(PaymentStatus.PENDING)
 
       table.text('notes').nullable()
 
       table
-        .bigInteger('created_by')
+        .integer('created_by')
         .unsigned()
         .nullable()
         .references('id')
@@ -48,8 +49,10 @@ export default class extends BaseSchema {
 
       table.check(`end_date >= start_date`)
       table.check(`final_price >= 0`)
-      table.check(`status in ('pending', 'active', 'expired', 'cancelled')`)
-      table.check(`payment_status in ('pending', 'partial', 'paid')`)
+      table.check(`status in ('${Status.ACTIVE}', '${Status.INACTIVE}', '${Status.SUSPENDED}')`)
+      table.check(
+        `payment_status in ('${PaymentStatus.PENDING}', '${PaymentStatus.PARTIAL}', '${PaymentStatus.PAID}')`
+      )
     })
 
     this.schema.alterTable(this.tableName, (table) => {

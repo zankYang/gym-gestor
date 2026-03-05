@@ -1,14 +1,16 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import { Role } from '#enums/role_enum'
+import { Status } from '#enums/status_enum'
 
 export default class extends BaseSchema {
   protected tableName = 'users'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigIncrements('id').primary()
+      table.increments('id').primary()
 
       table
-        .bigInteger('gym_id')
+        .integer('gym_id')
         .unsigned()
         .nullable()
         .references('id')
@@ -20,7 +22,7 @@ export default class extends BaseSchema {
       table.string('password', 255).notNullable()
 
       table.string('role', 30).notNullable()
-      table.string('status', 20).notNullable().defaultTo('active')
+      table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
@@ -28,8 +30,10 @@ export default class extends BaseSchema {
 
       table.unique(['gym_id', 'email'])
 
-      table.check(`role in ('superadmin', 'admin', 'receptionist', 'trainer')`)
-      table.check(`status in ('active', 'inactive')`)
+      table.check(
+        `role in ('${Role.SUPERADMIN}', '${Role.ADMIN}', '${Role.RECEPTIONIST}', '${Role.TRAINER}')`
+      )
+      table.check(`status in ('${Status.ACTIVE}', '${Status.INACTIVE}', '${Status.SUSPENDED}')`)
     })
 
     this.schema.alterTable(this.tableName, (table) => {

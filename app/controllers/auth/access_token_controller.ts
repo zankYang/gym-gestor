@@ -1,7 +1,6 @@
 import User from '#models/user'
 import { loginValidator } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
-import UserTransformer from '#transformers/user_transformer'
 import hash from '@adonisjs/core/services/hash'
 
 export default class AccessTokenController {
@@ -20,7 +19,7 @@ export default class AccessTokenController {
     const token = await User.accessTokens.create(user)
 
     return serialize({
-      user: UserTransformer.transform(user),
+      user,
       token: token.value!.release(),
     })
   }

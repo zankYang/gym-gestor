@@ -1,3 +1,4 @@
+import { PaymentMethod } from '#enums/payment_method_enum'
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
@@ -5,10 +6,10 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigIncrements('id').primary()
+      table.increments('id').primary()
 
       table
-        .bigInteger('gym_id')
+        .integer('gym_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -16,7 +17,7 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
 
       table
-        .bigInteger('membership_id')
+        .integer('membership_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -24,7 +25,7 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
 
       table
-        .bigInteger('client_id')
+        .integer('client_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -39,7 +40,7 @@ export default class extends BaseSchema {
       table.text('notes').nullable()
 
       table
-        .bigInteger('received_by')
+        .integer('received_by')
         .unsigned()
         .nullable()
         .references('id')
@@ -50,7 +51,9 @@ export default class extends BaseSchema {
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
 
       table.check(`amount > 0`)
-      table.check(`payment_method in ('cash', 'transfer', 'card', 'other')`)
+      table.check(
+        `payment_method in ('${PaymentMethod.CASH}', '${PaymentMethod.TRANSFER}', '${PaymentMethod.CARD}', '${PaymentMethod.OTHER}')`
+      )
     })
 
     this.schema.alterTable(this.tableName, (table) => {

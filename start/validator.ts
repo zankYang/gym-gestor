@@ -13,11 +13,30 @@
 
 import { DateTime } from 'luxon'
 import { VineDate } from '@vinejs/vine'
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
 declare module '@vinejs/vine/types' {
   interface VineGlobalTransforms {
     date: DateTime
   }
 }
+
+vine.messagesProvider = new SimpleMessagesProvider(
+  {
+    'required': '{{ field }} es obligatorio',
+    'email': 'El correo electrónico no es válido',
+    'in': '{{ field }} no es válido',
+    'database.exists': '{{ field }} no existe o no es válido',
+    'sameAs': 'El valor no coincide, favor de verificar',
+  },
+  {
+    gymId: 'Gimnasio',
+    fullName: 'Nombre completo',
+    email: 'Email',
+    password: 'Contraseña',
+    passwordConfirmation: 'Confirmación de contraseña',
+    role: 'Rol',
+  }
+)
 
 VineDate.transform((value) => DateTime.fromJSDate(value))

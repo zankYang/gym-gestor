@@ -1,5 +1,6 @@
 import factory from '@adonisjs/lucid/factories'
 import Gym from '#models/gym'
+import { Status } from '#enums/status_enum'
 
 export const GymFactory = factory
   .define(Gym, async ({ faker }) => {
@@ -14,7 +15,7 @@ export const GymFactory = factory
       email: faker.internet.email(),
       phone: faker.phone.number({ style: 'international' }),
       address: faker.location.streetAddress(),
-      status: faker.helpers.arrayElement(['active', 'inactive']),
+      status: faker.helpers.enumValue(Status),
     }
   })
   .build()

@@ -1,14 +1,15 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
+import { Status } from '#enums/status_enum'
 
 export default class extends BaseSchema {
   protected tableName = 'clients'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.bigIncrements('id').primary()
+      table.increments('id').primary()
 
       table
-        .bigInteger('gym_id')
+        .integer('gym_id')
         .unsigned()
         .notNullable()
         .references('id')
@@ -27,14 +28,14 @@ export default class extends BaseSchema {
       table.string('emergency_contact_phone', 20).nullable()
       table.text('notes').nullable()
 
-      table.string('status', 20).notNullable().defaultTo('active')
+      table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('deleted_at', { useTz: true }).nullable()
 
-      table.check(`gender in ('male', 'female', 'other')`)
-      table.check(`status in ('active', 'inactive')`)
+      table.check(`gender in ('Hombre', 'Mujer', 'Otro')`)
+      table.check(`status in ('${Status.ACTIVE}', '${Status.INACTIVE}', '${Status.SUSPENDED}')`)
     })
 
     this.schema.alterTable(this.tableName, (table) => {

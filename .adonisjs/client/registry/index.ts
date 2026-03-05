@@ -6,11 +6,59 @@ import type { ApiDefinition } from './tree.d.ts'
 const placeholder: any = {}
 
 const routes = {
-  'auth.new_account.store': {
+  'admin.list_gyms.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/admin/gyms',
+    tokens: [{"old":"/api/admin/gyms","type":0,"val":"api","end":""},{"old":"/api/admin/gyms","type":0,"val":"admin","end":""},{"old":"/api/admin/gyms","type":0,"val":"gyms","end":""}],
+    types: placeholder as Registry['admin.list_gyms.index']['types'],
+  },
+  'admin.create_gym.store': {
     methods: ["POST"],
-    pattern: '/api/auth/signup',
-    tokens: [{"old":"/api/auth/signup","type":0,"val":"api","end":""},{"old":"/api/auth/signup","type":0,"val":"auth","end":""},{"old":"/api/auth/signup","type":0,"val":"signup","end":""}],
-    types: placeholder as Registry['auth.new_account.store']['types'],
+    pattern: '/api/admin/gyms',
+    tokens: [{"old":"/api/admin/gyms","type":0,"val":"api","end":""},{"old":"/api/admin/gyms","type":0,"val":"admin","end":""},{"old":"/api/admin/gyms","type":0,"val":"gyms","end":""}],
+    types: placeholder as Registry['admin.create_gym.store']['types'],
+  },
+  'admin.update_gym.update': {
+    methods: ["PATCH"],
+    pattern: '/api/admin/gyms/:id',
+    tokens: [{"old":"/api/admin/gyms/:id","type":0,"val":"api","end":""},{"old":"/api/admin/gyms/:id","type":0,"val":"admin","end":""},{"old":"/api/admin/gyms/:id","type":0,"val":"gyms","end":""},{"old":"/api/admin/gyms/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.update_gym.update']['types'],
+  },
+  'admin.destroy_gym.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/admin/gyms/:id',
+    tokens: [{"old":"/api/admin/gyms/:id","type":0,"val":"api","end":""},{"old":"/api/admin/gyms/:id","type":0,"val":"admin","end":""},{"old":"/api/admin/gyms/:id","type":0,"val":"gyms","end":""},{"old":"/api/admin/gyms/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin.destroy_gym.destroy']['types'],
+  },
+  'users.list_users.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/users',
+    tokens: [{"old":"/api/users","type":0,"val":"api","end":""},{"old":"/api/users","type":0,"val":"users","end":""}],
+    types: placeholder as Registry['users.list_users.index']['types'],
+  },
+  'users.create_user.store': {
+    methods: ["POST"],
+    pattern: '/api/users',
+    tokens: [{"old":"/api/users","type":0,"val":"api","end":""},{"old":"/api/users","type":0,"val":"users","end":""}],
+    types: placeholder as Registry['users.create_user.store']['types'],
+  },
+  'users.show_user.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/users/:id',
+    tokens: [{"old":"/api/users/:id","type":0,"val":"api","end":""},{"old":"/api/users/:id","type":0,"val":"users","end":""},{"old":"/api/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['users.show_user.show']['types'],
+  },
+  'users.update_user.update': {
+    methods: ["PATCH"],
+    pattern: '/api/users/:id',
+    tokens: [{"old":"/api/users/:id","type":0,"val":"api","end":""},{"old":"/api/users/:id","type":0,"val":"users","end":""},{"old":"/api/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['users.update_user.update']['types'],
+  },
+  'users.destroy_user.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/users/:id',
+    tokens: [{"old":"/api/users/:id","type":0,"val":"api","end":""},{"old":"/api/users/:id","type":0,"val":"users","end":""},{"old":"/api/users/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['users.destroy_user.destroy']['types'],
   },
   'auth.access_token.store': {
     methods: ["POST"],
@@ -29,12 +77,6 @@ const routes = {
     pattern: '/api/auth/testing',
     tokens: [{"old":"/api/auth/testing","type":0,"val":"api","end":""},{"old":"/api/auth/testing","type":0,"val":"auth","end":""},{"old":"/api/auth/testing","type":0,"val":"testing","end":""}],
     types: placeholder as Registry['auth.testing.show']['types'],
-  },
-  'profile.profile.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/account/profile',
-    tokens: [{"old":"/api/account/profile","type":0,"val":"api","end":""},{"old":"/api/account/profile","type":0,"val":"account","end":""},{"old":"/api/account/profile","type":0,"val":"profile","end":""}],
-    types: placeholder as Registry['profile.profile.show']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

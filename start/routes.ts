@@ -17,6 +17,7 @@ router.get('/', () => {
 
 router
   .group(() => {
+    // Admin routes
     router
       .group(() => {
         router.get('gyms', [controllers.admin.ListGyms, 'index'])
@@ -27,6 +28,8 @@ router
       .prefix('/admin')
       .as('admin')
       .use([middleware.auth(), middleware.superadmin()])
+
+    // User routes
     router
       .group(() => {
         router.get('/', [controllers.user.ListUsers, 'index'])
@@ -37,23 +40,16 @@ router
       })
       .prefix('/users')
       .as('users')
-      .use([middleware.auth(), middleware.superadmin()])
+      .use([middleware.auth(), middleware.canManageUsers()])
+
+    // Auth routes
     router
       .group(() => {
-        router.post('signup', [controllers.NewAccount, 'store'])
-        router.post('login', [controllers.AccessToken, 'store'])
-        router.post('logout', [controllers.AccessToken, 'destroy']).use(middleware.auth())
-        router.get('testing', [controllers.Testing, 'show'])
+        router.post('login', [controllers.auth.AccessToken, 'store'])
+        router.post('logout', [controllers.auth.AccessToken, 'destroy']).use(middleware.auth())
+        router.get('testing', [controllers.auth.Testing, 'show'])
       })
       .prefix('/auth')
       .as('auth')
-
-    router
-      .group(() => {
-        router.get('/profile', [controllers.Profile, 'show'])
-      })
-      .prefix('/account')
-      .as('profile')
-      .use(middleware.auth())
   })
   .prefix('/api')
