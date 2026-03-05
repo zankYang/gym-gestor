@@ -47,7 +47,6 @@ router
       .group(() => {
         router.post('login', [controllers.auth.AccessToken, 'store'])
         router.post('logout', [controllers.auth.AccessToken, 'destroy']).use(middleware.auth())
-        router.get('testing', [controllers.auth.Testing, 'show'])
       })
       .prefix('/auth')
       .as('auth')

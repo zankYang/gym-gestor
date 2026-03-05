@@ -11,6 +11,7 @@ type Response = {
   data: {
     [key: string]: unknown
   }
+  meta?: unknown
 }
 
 type ResponseError = {
@@ -262,5 +263,104 @@ test.group('Creacion de usuarios', (group) => {
         },
       ],
     })
+  })
+})
+
+test.group('Listado de usuarios', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('listar usuarios como superadmin', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    await UserFactory.merge({ gymId: gym.id, role: Role.ADMIN }).createMany(5)
+    await UserFactory.merge({ gymId: gym.id, role: Role.RECEPTIONIST }).createMany(8)
+
+    const response = await client.get('/api/users').loginAs(superadmin).qs({ gymId: gym.id })
+
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuarios listados correctamente',
+    })
+    assert.exists(body)
+    assert.isArray(body.data)
+    assert.isAtLeast(body.data.length as number, 10)
+    assert.equal((body.meta as { total: number }).total, 13)
+  })
+
+  test('listar usuarios como admin devuelve 200 y solo usuarios de su gym', async ({
+    assert,
+    client,
+  }) => {
+    const gym1 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const gym2 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym1.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    await UserFactory.merge({
+      gymId: gym1.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).createMany(5)
+    await UserFactory.merge({
+      gymId: gym2.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).createMany(8)
+
+    const response = await client.get('/api/users').loginAs(admin)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuarios listados correctamente',
+    })
+    assert.exists(body)
+    assert.isArray(body.data)
+    assert.equal(body.data.length, 6)
+  })
+
+  test('listar usuarios sin autenticación devuelve 401', async ({ assert, client }) => {
+    const response = await client.get('/api/users')
+    response.assertStatus(401)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [
+        {
+          message: 'Unauthorized access',
+        },
+      ],
+    })
+  })
+
+  test('listar usuarios con paginación respeta page y perPage', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).createMany(5)
+
+    const response = await client.get('/api/users').loginAs(superadmin).qs({ page: 1, perPage: 2 })
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuarios listados correctamente',
+    })
+    assert.isArray(body.data)
+    assert.equal(body.data.length, 2)
+    assert.equal((body.meta as { perPage: number }).perPage, 2)
+    assert.equal((body.meta as { currentPage: number }).currentPage, 1)
   })
 })

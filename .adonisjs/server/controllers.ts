@@ -12,7 +12,6 @@ export const controllers = {
   },
   auth: {
     AccessToken: () => import('#controllers/auth/access_token_controller'),
-    Testing: () => import('#controllers/auth/testing_controller'),
   },
   user: {
     CreateUser: () => import('#controllers/user/create_user_controller'),

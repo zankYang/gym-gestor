@@ -14,7 +14,7 @@ export default class ShowUserController {
     }
     return response.status(200).send({
       message: 'Usuario encontrado',
-      data: user,
+      user,
     })
   }
 }
