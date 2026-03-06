@@ -80,7 +80,7 @@ export interface Registry {
       body: {}
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/user').showUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user/show_user_controller').default['show']>>>
     }
   }
@@ -126,17 +126,6 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/access_token_controller').default['destroy']>>>
-    }
-  }
-  'auth.testing.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/auth/testing'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/testing_controller').default['show']>>>
     }
   }
 }

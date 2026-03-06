@@ -38,8 +38,5 @@ export interface ApiDefinition {
       store: typeof routes['auth.access_token.store']
       destroy: typeof routes['auth.access_token.destroy']
     }
-    testing: {
-      show: typeof routes['auth.testing.show']
-    }
   }
 }

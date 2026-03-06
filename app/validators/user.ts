@@ -7,6 +7,7 @@ const email = () => vine.string().email().maxLength(150)
 const password = () => vine.string().minLength(8).maxLength(20)
 const roleEnum = () => vine.string().in([Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER])
 const statusEnum = () => vine.string().in([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED])
+const id = () => vine.number().exists({ table: 'users', column: 'id' })
 /**
  * Validator para crear un usuario (admin/superadmin).
  * El email se valida como único por gym en el controlador.
@@ -21,10 +22,24 @@ export const createUserValidator = vine.create({
 })
 
 /**
+ * Validator para mostrar un usuario.
+ */
+export const showUserValidator = vine.create({
+  id: id(),
+})
+
+/**
+ * Validator para dar de baja un usuario.
+ */
+export const destroyUserValidator = vine.create({
+  id: id(),
+})
+
+/**
  * Validator to use when performing self-signup
  */
 export const signupValidator = vine.create({
-  fullName: vine.string(),
+  fullName: fullName(),
   email: email().unique({ table: 'users', column: 'email' }),
   password: password(),
   passwordConfirmation: password().sameAs('password'),
@@ -36,18 +51,16 @@ export const signupValidator = vine.create({
  */
 export const loginValidator = vine.create({
   email: email(),
-  password: vine.string(),
+  password: password(),
 })
 
 /**
  * Validator para actualizar un usuario. Todos los campos opcionales.
  */
 export const updateUserValidator = vine.create({
-  gymId: vine.number().nullable().optional(),
-  fullName: vine.string().trim().minLength(1).maxLength(150).optional(),
-  email: vine.string().email().maxLength(150).optional(),
-  password: vine.string().minLength(8).maxLength(32).optional(),
-  passwordConfirmation: vine.string().minLength(8).maxLength(32).sameAs('password').optional(),
+  fullName: fullName().optional(),
+  email: email().optional(),
+  password: password().optional(),
   role: roleEnum().optional(),
   status: statusEnum().optional(),
 })

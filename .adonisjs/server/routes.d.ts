@@ -15,19 +15,16 @@ export type ScannedRoutes = {
     'users.destroy_user.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'auth.access_token.store': { paramsTuple?: []; params?: {} }
     'auth.access_token.destroy': { paramsTuple?: []; params?: {} }
-    'auth.testing.show': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'admin.list_gyms.index': { paramsTuple?: []; params?: {} }
     'users.list_users.index': { paramsTuple?: []; params?: {} }
     'users.show_user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'auth.testing.show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'admin.list_gyms.index': { paramsTuple?: []; params?: {} }
     'users.list_users.index': { paramsTuple?: []; params?: {} }
     'users.show_user.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'auth.testing.show': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'admin.create_gym.store': { paramsTuple?: []; params?: {} }

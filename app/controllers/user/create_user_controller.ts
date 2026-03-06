@@ -16,30 +16,18 @@ export default class CreateUserController {
 
     if (currentUser.role !== Role.SUPERADMIN && payload.role === Role.ADMIN) {
       return response.status(403).send({
-        errors: [
-          {
-            message: 'No tienes permisos para crear admins',
-          },
-        ],
+        errors: [{ message: 'No tienes permisos para crear admins' }],
       })
     }
     if (currentUser.role === Role.ADMIN && payload.gymId !== currentUser.gymId) {
-      return response.status(403).send({
-        errors: [
-          {
-            message: 'No tienes permisos para crear usuarios en este gym',
-          },
-        ],
-      })
+      return response
+        .status(403)
+        .send({ errors: [{ message: 'No tienes permisos para crear usuarios en este gym' }] })
     }
     if (existingUser) {
-      return response.status(409).send({
-        errors: [
-          {
-            message: 'Ya existe un usuario con ese email en este gym',
-          },
-        ],
-      })
+      return response
+        .status(409)
+        .send({ errors: [{ message: 'Ya existe un usuario con ese email en este gym' }] })
     }
 
     const hashedPassword = await hash.make(payload.password)

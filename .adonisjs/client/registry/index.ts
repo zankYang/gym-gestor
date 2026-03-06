@@ -72,12 +72,6 @@ const routes = {
     tokens: [{"old":"/api/auth/logout","type":0,"val":"api","end":""},{"old":"/api/auth/logout","type":0,"val":"auth","end":""},{"old":"/api/auth/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['auth.access_token.destroy']['types'],
   },
-  'auth.testing.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/auth/testing',
-    tokens: [{"old":"/api/auth/testing","type":0,"val":"api","end":""},{"old":"/api/auth/testing","type":0,"val":"auth","end":""},{"old":"/api/auth/testing","type":0,"val":"testing","end":""}],
-    types: placeholder as Registry['auth.testing.show']['types'],
-  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

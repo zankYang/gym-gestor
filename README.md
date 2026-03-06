@@ -20,18 +20,6 @@ Sistema de gestión para gimnasios.
 |------------|---------|
 | **PostgreSQL** | 18 |
 
-### Módulos principales de AdonisJS
-| Módulo | Versión |
-|--------|---------|
-| **@adonisjs/core** | ^7.0.0 |
-| **@adonisjs/lucid** (ORM) | ^22.0.0 |
-| **@adonisjs/auth** | ^10.0.0 |
-| **@adonisjs/session** | ^8.0.0 |
-| **@adonisjs/shield** (CSRF, XSS) | ^9.0.0 |
-| **@adonisjs/cors** | ^3.0.0 |
-| **@vinejs/vine** (validación) | ^4.3.0 |
-| **luxon** (fechas) | ^3.7.x |
-
 ### Desarrollo y calidad de código
 | Tecnología | Versión |
 |------------|---------|
@@ -48,18 +36,33 @@ Sistema de gestión para gimnasios.
 
 ## Instalación
 
+Con **nvm** (Node Version Manager) y **pnpm** instalados:
+
 ```bash
-# Dependencias
+# 1. Usar la versión de Node del proyecto (24.14.x)
+nvm use
+
+
+# 2. Instalar dependencias
 pnpm install
 
-# Variables de entorno (crear .env con conexión a PostgreSQL 18)
-# DB_CONNECTION=pg
-# PGHOST=localhost
-# PGPORT=5432
-# PGUSER=...
-# PGPASSWORD=...
-# PGDATABASE=gym_gestor
+# 3. Copiar variables de entorno y configurar (crear .env con tu conexión a PostgreSQL)
+cp .env.example .env
+node ace generate:key
+cp .env .env.test
+# Cambiar las variables de database para usar la de test
+
+# 4. Ejecutar migraciones
+node ace migration:run
+
+# 5. (Opcional) Crear el primer superadmin
+node ace create:superadmin
+
+# 6. Arrancar el servidor de desarrollo
+pnpm dev
 ```
+
+Si no usas nvm, instala Node.js 24.14.x y luego ejecuta desde el paso 3.
 
 ## Scripts
 
@@ -72,6 +75,29 @@ pnpm install
 | `pnpm lint` | Linter |
 | `pnpm format` | Formatear código |
 | `pnpm typecheck` | Comprobar tipos TypeScript |
+
+Para ejecutar solo un grupo de tests: `node ace test --group "Nombre del grupo"`.
+
+## Migraciones
+
+Comandos típicos de Lucid (base de datos):
+
+| Comando | Descripción |
+|---------|-------------|
+| `node ace migration:run` | Ejecutar migraciones pendientes |
+| `node ace migration:rollback` | Revertir la última migración |
+| `node ace migration:status` | Ver estado de las migraciones |
+| `node ace make:migration nombre_de_la_migracion` | Crear una nueva migración |
+
+## Comandos Ace (personalizados)
+
+| Comando | Descripción |
+|---------|-------------|
+| `node ace create:superadmin --email=tu@email.com --fullName="Tu nombre" --password=tucontraseña` | Crear superadmin con flags personalizados (`-e`, `-n`, `-p`) |
+
+## Contribución
+
+Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm test` deben pasar.
 
 ## Licencia
 

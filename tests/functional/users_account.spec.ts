@@ -364,3 +364,455 @@ test.group('Listado de usuarios', (group) => {
     assert.equal((body.meta as { currentPage: number }).currentPage, 1)
   })
 })
+
+test.group('Mostrar datos de un usuario', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('mostrar datos de un usuario como superadmin', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.get(`/api/users/${user.id}`).loginAs(superadmin)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuario encontrado',
+    })
+    assert.exists(body.data)
+    assert.equal(body.data.id, user.id)
+    assert.equal(body.data.fullName, user.fullName)
+  })
+
+  test('mostrar datos de un usuario como admin del mismo gym', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.get(`/api/users/${user.id}`).loginAs(admin)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuario encontrado',
+    })
+    assert.equal(body.data.id, user.id)
+    assert.equal(body.data.gymId, gym.id)
+  })
+
+  test('admin no puede ver usuario de otro gym', async ({ assert, client }) => {
+    const gym1 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const gym2 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym1.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const userOtroGym = await UserFactory.merge({
+      gymId: gym2.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.get(`/api/users/${userOtroGym.id}`).loginAs(admin)
+
+    response.assertStatus(403)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'No puedes ver usuarios de otro gym' }],
+    })
+  })
+
+  test('usuario no encontrado devuelve 404', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+    await user.softDelete()
+
+    const response = await client.get(`/api/users/${user.id}`).loginAs(superadmin)
+
+    response.assertStatus(404)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'Usuario no encontrado' }],
+    })
+  })
+
+  test('mostrar usuario sin autenticación devuelve 401', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.get(`/api/users/${user.id}`)
+
+    response.assertStatus(401)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'Unauthorized access' }],
+    })
+  })
+
+  test('id inválido devuelve 422', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.get('/api/users/abc').loginAs(superadmin)
+
+    response.assertStatus(422)
+    const body = response.body()
+    assert.exists(body)
+    assert.isArray((body as { errors: unknown }).errors)
+  })
+})
+
+test.group('Dar de baja usuario (destroy)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('superadmin puede dar de baja a un usuario (receptionist/trainer)', async ({
+    assert,
+    client,
+  }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${user.id}`).loginAs(superadmin)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuario dado de baja correctamente',
+    })
+    await user.refresh()
+    assert.isNotNull(user.deletedAt)
+  })
+
+  test('admin puede dar de baja a un usuario de su mismo gym', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${user.id}`).loginAs(admin)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, {
+      message: 'Usuario dado de baja correctamente',
+    })
+    await user.refresh()
+    assert.isNotNull(user.deletedAt)
+  })
+
+  test('admin no puede dar de baja a usuario de otro gym', async ({ assert, client }) => {
+    const gym1 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const gym2 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym1.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const userOtroGym = await UserFactory.merge({
+      gymId: gym2.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${userOtroGym.id}`).loginAs(admin)
+
+    response.assertStatus(403)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'No puedes dar de baja usuarios de otro gym' }],
+    })
+  })
+
+  test('no se puede dar de baja a un superadmin', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const otroSuperadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${otroSuperadmin.id}`).loginAs(superadmin)
+
+    response.assertStatus(403)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'No se puede dar de baja a este usuario' }],
+    })
+  })
+
+  test('no se puede dar de baja a un admin sino eres superadmin', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const superadmin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${admin.id}`).loginAs(superadmin)
+
+    response.assertStatus(403)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'No se puede dar de baja a este usuario' }],
+    })
+  })
+
+  test('dar de baja usuario sin autenticación devuelve 401', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete(`/api/users/${user.id}`)
+
+    response.assertStatus(401)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [{ message: 'Unauthorized access' }],
+    })
+  })
+
+  test('id inválido devuelve 422', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.delete('/api/users/abc').loginAs(superadmin)
+
+    response.assertStatus(422)
+    const body = response.body()
+    assert.exists(body)
+    assert.isArray((body as { errors: unknown }).errors)
+  })
+})
+
+test.group('Actualizar usuario (update)', (group) => {
+  group.each.setup(() => testUtils.db().truncate())
+
+  test('superadmin puede actualizar un usuario', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${user.id}`)
+      .loginAs(superadmin)
+      .json({ fullName: 'Nombre actualizado', status: Status.INACTIVE })
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, { message: 'Usuario actualizado correctamente' })
+    assert.equal(body.data.fullName, 'Nombre actualizado')
+    assert.equal(body.data.status, Status.INACTIVE)
+  })
+
+  test('admin puede actualizar un usuario de su mismo gym', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${user.id}`)
+      .loginAs(admin)
+      .json({ fullName: 'Recepcionista actualizado' })
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, { message: 'Usuario actualizado correctamente' })
+    assert.equal(body.data.fullName, 'Recepcionista actualizado')
+  })
+
+  test('admin no puede actualizar usuario de otro gym', async ({ client }) => {
+    const gym1 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const gym2 = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym1.id,
+      role: Role.ADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const userOtroGym = await UserFactory.merge({
+      gymId: gym2.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${userOtroGym.id}`)
+      .loginAs(admin)
+      .json({ fullName: 'No debería actualizar' })
+
+    response.assertStatus(404)
+  })
+
+  test('actualizar usuario con contraseña', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${user.id}`)
+      .loginAs(superadmin)
+      .json({ password: 'nuevaClave123' })
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepInclude(body, { message: 'Usuario actualizado correctamente' })
+    assert.exists(body.data)
+    const updatedUser = await User.find(user.id)
+    assert.exists(updatedUser)
+    const ok = await import('@adonisjs/core/services/hash').then((h) =>
+      h.default.verify(updatedUser!.password, 'nuevaClave123')
+    )
+    assert.isTrue(ok)
+  })
+
+  test('actualizar usuario sin autenticación devuelve 401', async ({ assert, client }) => {
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client.patch(`/api/users/${user.id}`).json({ fullName: 'Sin auth' })
+
+    response.assertStatus(401)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, { errors: [{ message: 'Unauthorized access' }] })
+  })
+
+  test('actualizar con email inválido devuelve 422', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${user.id}`)
+      .loginAs(superadmin)
+      .json({ email: 'no-es-email' })
+
+    response.assertStatus(422)
+    const body = response.body()
+    assert.exists(body)
+    assert.isArray((body as { errors: unknown }).errors)
+  })
+
+  test('actualizar con rol inválido devuelve 422', async ({ assert, client }) => {
+    const superadmin = await UserFactory.merge({
+      gymId: null,
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
+    }).create()
+    const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
+    const user = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.RECEPTIONIST,
+      status: Status.ACTIVE,
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${user.id}`)
+      .loginAs(superadmin)
+      .json({ role: 'rol_invalido' })
+
+    response.assertStatus(422)
+    const body = response.body()
+    assert.exists(body)
+    assert.isArray((body as { errors: unknown }).errors)
+  })
+})

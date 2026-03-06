@@ -2,6 +2,8 @@ import { BaseCommand, flags } from '@adonisjs/core/ace'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
 import { CommandOptions } from '@adonisjs/core/types/ace'
+import { Status } from '#enums/status_enum'
+import { Role } from '#enums/role_enum'
 
 export default class CreateSuperadmin extends BaseCommand {
   static commandName = 'create:superadmin'
@@ -58,8 +60,8 @@ export default class CreateSuperadmin extends BaseCommand {
       fullName: this.fullName.trim(),
       email: this.email.trim(),
       password,
-      role: 'superadmin',
-      status: 'active',
+      role: Role.SUPERADMIN,
+      status: Status.ACTIVE,
     })
 
     this.logger.success(`Superadmin creado: ${user.email} (id: ${user.id})`)
