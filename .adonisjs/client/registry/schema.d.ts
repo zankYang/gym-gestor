@@ -99,10 +99,10 @@ export interface Registry {
     methods: ["DELETE"]
     pattern: '/api/users/:id'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/user').destroyUserValidator)>>
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').destroyUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user/destroy_user_controller').default['destroy']>>>
     }
   }

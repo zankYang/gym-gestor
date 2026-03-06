@@ -1,13 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateGymValidator } from '#validators/gym'
 import Gym from '#models/gym'
-import GymTransformer from '#transformers/gym_transformer'
 
 export default class UpdateGymController {
   /**
    * Actualiza un gym por id. Solo superadmin puede gestionar cualquier gym.
    */
-  async update({ params, request, response, serialize }: HttpContext) {
+  async update({ params, request, response }: HttpContext) {
     const gym = await Gym.notDeleted().where('id', params.id).firstOrFail()
     const payload = await request.validateUsing(updateGymValidator)
 
@@ -28,7 +27,7 @@ export default class UpdateGymController {
 
     return response.ok({
       message: 'Gym actualizado correctamente',
-      data: serialize(GymTransformer.transform(gym)),
+      data: gym,
     })
   }
 }

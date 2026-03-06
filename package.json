@@ -15,7 +15,10 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "review": "pnpm lint && pnpm format && pnpm typecheck",
+    "review:fix": "pnpm lint --fix && pnpm format --write && pnpm typecheck --fix",
+    "review:test": "pnpm lint --fix && pnpm format --write && pnpm typecheck && pnpm test"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

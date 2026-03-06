@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "./",
     "jsx": "react",
-    "outDir": "./build",    
+    "outDir": "./build",
     "module": "NodeNext",
     "isolatedModules": true,
     "declaration": false,
