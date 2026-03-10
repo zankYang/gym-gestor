@@ -103,6 +103,58 @@ Comandos típicos de Lucid (base de datos):
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm test` deben pasar.
 
+## Commits: buenas prácticas y Conventional Commits
+
+Seguimos [Conventional Commits](https://www.conventionalcommits.org/) para mensajes de commit claros y automatizables.
+
+### Formato del mensaje
+
+```
+<tipo>[ámbito opcional]: <descripción>
+
+[cuerpo opcional]
+
+[pie opcional]
+```
+
+- **tipo**: indica el tipo de cambio (ver más abajo).
+- **ámbito**: parte del proyecto afectada (ej. `auth`, `migrations`, `api`).
+- **descripción**: resumen breve en imperativo («añade» no «añadido» ni «añadiendo»).
+
+### Tipos de commit
+
+| Tipo       | Uso |
+| ---------- | --- |
+| `feat`     | Nueva funcionalidad. |
+| `fix`      | Corrección de un bug. |
+| `docs`     | Solo documentación (README, comentarios, etc.). |
+| `style`    | Cambios de formato (espacios, punto y coma, etc.), sin cambio de lógica. |
+| `refactor` | Cambio de código que no añade funcionalidad ni corrige un bug. |
+| `perf`     | Mejora de rendimiento. |
+| `test`     | Añadir o modificar tests. |
+| `chore`    | Tareas de mantenimiento (deps, config, scripts). |
+| `ci`       | Cambios en CI/CD. |
+| `build`    | Cambios en el sistema de build o dependencias externas. |
+
+### Buenas prácticas
+
+- **Un commit = un cambio lógico**: evita mezclar varias funcionalidades o fixes en un solo commit.
+- **Descripción en imperativo**: «añade login» en lugar de «añadido login» o «añadiendo login».
+- **Línea de asunto ≤ 72 caracteres**: facilita la lectura en logs y herramientas.
+- **Cuerpo opcional**: si hace falta contexto, usa el cuerpo del mensaje para explicar el *qué* y el *por qué*.
+- **Breaking changes**: si rompes compatibilidad, indica en el pie: `BREAKING CHANGE: descripción` o usa `!` tras el tipo/ámbito (ej. `feat(api)!: cambia contrato del endpoint`).
+
+### Ejemplos
+
+```bash
+feat(auth): añade login con email y contraseña
+fix(migrations): corrige tipo de columna en tabla users
+docs: actualiza instrucciones de instalación en README
+refactor(api): extrae validación de clientes a servicio
+chore(deps): actualiza AdonisJS a 7.1.0
+feat(api)!: reemplaza paginación por cursor
+```
+
 ## Licencia
 
 MIT

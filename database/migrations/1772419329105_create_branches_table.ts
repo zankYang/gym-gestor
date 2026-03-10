@@ -1,43 +1,36 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-import { Role } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
 export default class extends BaseSchema {
-  protected tableName = 'users'
+  protected tableName = 'branches'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').primary()
+      table.increments('id')
 
       table
-        .integer('gym_id')
-        .unsigned()
-        .nullable()
+        .integer('tenant_id')
+        .notNullable()
         .references('id')
-        .inTable('gyms')
+        .inTable('tenants')
         .onDelete('CASCADE')
+        .onUpdate('CASCADE')
 
-      table.string('full_name', 150).notNullable()
-      table.string('email', 150).notNullable()
-      table.string('password', 255).notNullable()
-
-      table.string('role', 30).notNullable()
+      table.string('name', 150).notNullable()
+      table.string('code', 50).notNullable()
+      table.string('phone', 30).nullable()
+      table.string('email', 150).nullable()
+      table.text('address').nullable()
       table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('deleted_at', { useTz: true }).nullable()
 
-      table.unique(['gym_id', 'email'])
-
-      table.check(
-        `role in ('${Role.SUPERADMIN}', '${Role.ADMIN}', '${Role.RECEPTIONIST}', '${Role.TRAINER}')`
-      )
+      table.unique(['tenant_id', 'code'])
+      table.index(['tenant_id'])
+      table.index(['status'])
       table.check(`status in ('${Status.ACTIVE}', '${Status.INACTIVE}', '${Status.SUSPENDED}')`)
-    })
-
-    this.schema.alterTable(this.tableName, (table) => {
-      table.index(['gym_id'])
     })
   }
 

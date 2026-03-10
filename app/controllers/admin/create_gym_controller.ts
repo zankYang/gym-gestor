@@ -7,6 +7,7 @@ export default class CreateGymController {
     const payload = await request.validateUsing(createGymValidator)
 
     const gym = await Gym.create(payload)
+
     return response.status(201).send({
       message: 'Gym creado correctamente',
       data: gym,
