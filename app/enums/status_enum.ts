@@ -17,4 +17,9 @@ export enum Status {
   ARCHIVED = 'Archivado',
   DRAFT = 'Borrador',
   COMPLETED = 'Completado',
+  RESERVED = 'Reservado',
+  ATTENDED = 'Asistido',
+  NO_SHOW = 'No asistido',
+  SENT = 'Enviado',
+  FAILED = 'Fallido',
 }
