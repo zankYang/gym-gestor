@@ -19,7 +19,7 @@ export default class extends BaseSchema {
         .integer('exercise_catalog_id')
         .notNullable()
         .references('id')
-        .inTable('exercise_catalog')
+        .inTable('exercise_catalogs')
         .onDelete('RESTRICT')
         .onUpdate('CASCADE')
 
