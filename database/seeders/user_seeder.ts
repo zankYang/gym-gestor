@@ -6,17 +6,18 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class UserSeeder extends BaseSeeder {
   async run() {
-    const users: { password: string; role: Role; status: Status }[] = [
-      { password: '123456', role: Role.ADMIN, status: Status.ACTIVE },
-      { password: '123456', role: Role.RECEPTIONIST, status: Status.ACTIVE },
-      { password: '123456', role: Role.TRAINER, status: Status.ACTIVE },
+    const users: { email: string; password: string; role: Role }[] = [
+      { email: 'admin@gymgestor.com', password: '12345678', role: Role.ADMIN },
+      { email: 'user@gymgestor.com', password: '12345678', role: Role.RECEPTIONIST },
+      { email: 'user2@gymgestor.com', password: '12345678', role: Role.TRAINER },
     ]
 
     for (const user of users) {
       await UserFactory.merge({
+        email: user.email,
         password: await hash.make(user.password),
         role: user.role,
-        status: user.status,
+        status: Status.ACTIVE,
       }).create()
     }
   }

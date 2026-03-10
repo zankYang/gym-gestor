@@ -17,7 +17,6 @@ export const createUserValidator = vine.create({
   fullName: fullName(),
   email: email(),
   password: password(),
-  passwordConfirmation: password().sameAs('password'),
   role: roleEnum(),
 })
 
@@ -33,16 +32,6 @@ export const showUserValidator = vine.create({
  */
 export const destroyUserValidator = vine.create({
   id: id(),
-})
-
-/**
- * Validator to use when performing self-signup
- */
-export const signupValidator = vine.create({
-  fullName: fullName(),
-  email: email().unique({ table: 'users', column: 'email' }),
-  password: password(),
-  passwordConfirmation: password().sameAs('password'),
 })
 
 /**

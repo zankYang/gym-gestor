@@ -27,13 +27,10 @@ test.group('Creacion de administradores', (group) => {
       gymId: gym.id,
       role: Role.ADMIN,
       status: Status.ACTIVE,
+      password: '12345678',
     }).make()
 
-    const response = await client
-      .post('/api/users')
-      .loginAs(superadmin)
-      .json({ ...admin.toJSON(), password: '12345678', passwordConfirmation: '12345678' })
-
+    const response = await client.post('/api/users').loginAs(superadmin).json(admin)
     response.assertStatus(201)
     const body = response.body()! as Response
     assert.deepInclude(body, {
@@ -50,15 +47,11 @@ test.group('Creacion de administradores', (group) => {
       gymId: gym.id,
       role: Role.ADMIN,
       status: Status.ACTIVE,
+      password: '12345678',
     }).make()
 
-    const responseAdmin = await client
-      .post('/api/users')
-      .loginAs(admin)
-      .json({ ...user.toJSON(), password: '12345678', passwordConfirmation: '12345678' })
-    const responseUser = await client
-      .post('/api/users')
-      .json({ ...user.toJSON(), password: '12345678', passwordConfirmation: '12345678' })
+    const responseAdmin = await client.post('/api/users').loginAs(admin).json(user)
+    const responseUser = await client.post('/api/users').json(user)
 
     responseAdmin.assertStatus(403)
     const bodyAdmin = responseAdmin.body()! as ResponseError
@@ -83,12 +76,13 @@ test.group('Creacion de administradores', (group) => {
   test('crear un admin con email ya existente', async ({ assert, client }) => {
     const gym = await GymFactory.merge({ status: Status.ACTIVE }).create()
     const superadmin = await UserFactory.merge({ gymId: null, role: Role.SUPERADMIN }).create()
-    const admin = await UserFactory.merge({ gymId: gym.id, role: Role.ADMIN }).create()
+    const admin = await UserFactory.merge({
+      gymId: gym.id,
+      role: Role.ADMIN,
+      password: '12345678',
+    }).create()
 
-    const response = await client
-      .post('/api/users')
-      .loginAs(superadmin)
-      .json({ ...admin.toJSON(), password: '12345678', passwordConfirmation: '12345678' })
+    const response = await client.post('/api/users').loginAs(superadmin).json(admin)
 
     response.assertStatus(409)
     const body = response.body()! as ResponseError
@@ -131,7 +125,6 @@ test.group('Creacion de administradores', (group) => {
       .json({
         ...payload,
         password: '12345678',
-        passwordConfirmation: '123456789',
       })
 
     responseNull.assertStatus(422)
@@ -151,7 +144,6 @@ test.group('Creacion de administradores', (group) => {
       'Rol es obligatorio',
       'Gimnasio es obligatorio',
       'Contraseña es obligatorio',
-      'Confirmación de contraseña es obligatorio',
     ].sort()
     const actualMessages = bodyNull.errors.map((e) => e.message).sort()
     assert.deepEqual(actualMessages, nullMessages)
@@ -162,7 +154,6 @@ test.group('Creacion de administradores', (group) => {
       'Rol es obligatorio',
       'Gimnasio es obligatorio',
       'Contraseña es obligatorio',
-      'Confirmación de contraseña es obligatorio',
     ].sort()
     const actualInvalidEmailMessages = bodyInvalidEmail.errors.map((e) => e.message).sort()
     assert.deepEqual(actualInvalidEmailMessages, invalidEmailMessages)
@@ -173,7 +164,6 @@ test.group('Creacion de administradores', (group) => {
       'Rol no es válido',
       'Gimnasio es obligatorio',
       'Contraseña es obligatorio',
-      'Confirmación de contraseña es obligatorio',
     ].sort()
     const actualInvalidRolMessages = bodyInvalidRole.errors.map((e) => e.message).sort()
     assert.deepEqual(actualInvalidRolMessages, invalidRolMessages)
@@ -184,7 +174,6 @@ test.group('Creacion de administradores', (group) => {
       'Rol es obligatorio',
       'Gimnasio no existe o no es válido',
       'Contraseña es obligatorio',
-      'Confirmación de contraseña es obligatorio',
     ].sort()
     const actualInvalidGymIdMessages = bodyInvalidGymId.errors.map((e) => e.message).sort()
     assert.deepEqual(actualInvalidGymIdMessages, invalidGymIdMessages)
@@ -194,7 +183,6 @@ test.group('Creacion de administradores', (group) => {
       'Email es obligatorio',
       'Rol es obligatorio',
       'Gimnasio es obligatorio',
-      'El valor no coincide, favor de verificar',
     ].sort()
     const actualInvalidPassConfirmationMessages = bodyInvalidPassConfirmation.errors
       .map((e) => e.message)
@@ -218,11 +206,11 @@ test.group('Creacion de usuarios', (group) => {
     const responseSuperadmin = await client
       .post('/api/users')
       .loginAs(superadmin)
-      .json({ ...user[0].toJSON(), password: '12345678', passwordConfirmation: '12345678' })
+      .json({ ...user[0].toJSON(), password: '12345678' })
     const responseAdmin = await client
       .post('/api/users')
       .loginAs(admin)
-      .json({ ...user[1].toJSON(), password: '12345678', passwordConfirmation: '12345678' })
+      .json({ ...user[1].toJSON(), password: '12345678' })
 
     responseSuperadmin.assertStatus(201)
     responseAdmin.assertStatus(201)
@@ -252,7 +240,7 @@ test.group('Creacion de usuarios', (group) => {
     const response = await client
       .post('/api/users')
       .loginAs(user[0])
-      .json({ ...user[1].toJSON(), password: '12345678', passwordConfirmation: '12345678' })
+      .json({ ...user[1].toJSON(), password: '12345678' })
 
     response.assertStatus(403)
     const body = response.body()! as ResponseError

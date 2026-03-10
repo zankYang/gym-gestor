@@ -28,13 +28,13 @@ vine.messagesProvider = new SimpleMessagesProvider(
     'in': '{{ field }} no es válido',
     'database.exists': '{{ field }} no existe o no es válido',
     'sameAs': 'El valor no coincide, favor de verificar',
+    'minLength': 'El valor de {{ field }} debe tener al menos {{ min }} caracteres',
   },
   {
     gymId: 'Gimnasio',
     fullName: 'Nombre completo',
     email: 'Email',
     password: 'Contraseña',
-    passwordConfirmation: 'Confirmación de contraseña',
     role: 'Rol',
   }
 )

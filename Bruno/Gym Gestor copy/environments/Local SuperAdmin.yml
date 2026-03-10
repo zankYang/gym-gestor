@@ -1,0 +1,10 @@
+name: Local SuperAdmin
+variables:
+  - name: apiUrl
+    value: http://localhost:3333
+  - secret: true
+    name: token
+  - name: email
+    value: superadmin@gymgestor.com
+  - name: password
+    value: admin2026

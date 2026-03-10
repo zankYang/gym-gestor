@@ -1,0 +1,10 @@
+name: Local User
+variables:
+  - name: apiUrl
+    value: http://localhost:3333
+  - secret: true
+    name: token
+  - name: email
+    value: user@gymgestor.com
+  - name: password
+    value: "12345678"
