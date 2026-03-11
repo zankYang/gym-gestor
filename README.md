@@ -6,30 +6,38 @@ Sistema de gestión para gimnasios.
 
 ### Entorno de ejecución
 
+
 | Tecnología  | Versión                |
 | ----------- | ---------------------- |
 | **Node.js** | 24.14.x (ver `.nvmrc`) |
 
+
 ### Backend
+
 
 | Tecnología     | Versión |
 | -------------- | ------- |
 | **AdonisJS**   | 7.x     |
 | **TypeScript** | 5.9.x   |
 
+
 ### Base de datos
+
 
 | Tecnología     | Versión |
 | -------------- | ------- |
 | **PostgreSQL** | 18      |
 
+
 ### Desarrollo y calidad de código
+
 
 | Tecnología       | Versión |
 | ---------------- | ------- |
 | **ESLint**       | ^10.0.2 |
 | **Prettier**     | ^3.8.1  |
 | **Japa** (tests) | ^5.x    |
+
 
 ---
 
@@ -44,8 +52,8 @@ Con **nvm** (Node Version Manager) y **pnpm** instalados:
 
 ```bash
 # 1. Usar la versión de Node del proyecto (24.14.x)
+nvm install
 nvm use
-
 
 # 2. Instalar dependencias
 pnpm install
@@ -70,6 +78,7 @@ Si no usas nvm, instala Node.js 24.14.x y luego ejecuta desde el paso 3.
 
 ## Scripts
 
+
 | Comando          | Descripción                    |
 | ---------------- | ------------------------------ |
 | `pnpm dev`       | Servidor de desarrollo con HMR |
@@ -80,11 +89,13 @@ Si no usas nvm, instala Node.js 24.14.x y luego ejecuta desde el paso 3.
 | `pnpm format`    | Formatear código               |
 | `pnpm typecheck` | Comprobar tipos TypeScript     |
 
+
 Para ejecutar solo un grupo de tests: `node ace test --group "Nombre del grupo"`.
 
 ## Migraciones
 
 Comandos típicos de Lucid (base de datos):
+
 
 | Comando                                          | Descripción                     |
 | ------------------------------------------------ | ------------------------------- |
@@ -93,15 +104,48 @@ Comandos típicos de Lucid (base de datos):
 | `node ace migration:status`                      | Ver estado de las migraciones   |
 | `node ace make:migration nombre_de_la_migracion` | Crear una nueva migración       |
 
+
 ## Comandos Ace (personalizados)
+
 
 | Comando                                                                                          | Descripción                                                  |
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `node ace create:superadmin --email=tu@email.com --fullName="Tu nombre" --password=tucontraseña` | Crear superadmin con flags personalizados (`-e`, `-n`, `-p`) |
 
+
 ## Contribución
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm test` deben pasar.
+
+### Proceso para subir cambios
+
+La rama por defecto del repositorio es `**dev**`. Cualquier cambio que quieras incorporar a `dev` debe seguir este flujo:
+
+1. **Crear una rama** desde `dev` con tu trabajo (por ejemplo `feature/nombre` o `fix/descripcion`).
+2. **Abrir un Pull Request (PR)** hacia la rama `dev`. No se aceptan pushes directos a `dev`.
+3. **Revisión y aprobación**: el PR debe ser revisado y aprobado por al menos una persona con permisos. Para que un PR sea aprobado, debe incluir:
+  - **Tests**: pruebas (Japa) que cubran la funcionalidad o el fix que introduces.
+  - **Bruno**: colección o peticiones en [Bruno](https://www.usebruno.com/) para probar manualmente los endpoints o flujos afectados.
+4. **CI debe pasar**: el workflow de GitHub Actions (`.github/workflows/ci.yml`) se ejecuta en cada push y en cada PR hacia `main`, `develop` y `dev`. El CI ejecuta:
+  - `pnpm lint`
+  - `pnpm format:check`
+  - `pnpm typecheck`
+  - migraciones y `pnpm test`
+   El PR solo puede integrarse cuando el CI esté en verde.
+5. **Merge**: una vez aprobado y con el CI en verde, se hace merge del PR a `dev`.
+
+En resumen: **todo cambio a `dev` pasa por un PR, con aprobación y con el CI en verde.**
+
+### Extensiones recomendadas (VS Code)
+
+Para tener una mejor DX, se recomiendan las siguientes extensiones en VS Code:
+
+- **AdonisJS**: soporte para snippets, comandos y ayudas específicas del framework.
+- **Prettier**: formateo automático consistente con la configuración del proyecto.
+- **Conventional Commits**: ayuda a escribir mensajes de commit siguiendo el estándar definido en este README.
+- **ESLint**: muestra problemas de linting directamente en el editor.
+- **GitLens**: mejora la experiencia con Git (historial, blame, comparación de cambios).
+- **Japa**: soporte para tests con Japa (snippets, ejecución focalizada, etc.).
 
 ## Commits: buenas prácticas y Conventional Commits
 
@@ -123,18 +167,20 @@ Seguimos [Conventional Commits](https://www.conventionalcommits.org/) para mensa
 
 ### Tipos de commit
 
-| Tipo       | Uso |
-| ---------- | --- |
-| `feat`     | Nueva funcionalidad. |
-| `fix`      | Corrección de un bug. |
-| `docs`     | Solo documentación (README, comentarios, etc.). |
+
+| Tipo       | Uso                                                                      |
+| ---------- | ------------------------------------------------------------------------ |
+| `feat`     | Nueva funcionalidad.                                                     |
+| `fix`      | Corrección de un bug.                                                    |
+| `docs`     | Solo documentación (README, comentarios, etc.).                          |
 | `style`    | Cambios de formato (espacios, punto y coma, etc.), sin cambio de lógica. |
-| `refactor` | Cambio de código que no añade funcionalidad ni corrige un bug. |
-| `perf`     | Mejora de rendimiento. |
-| `test`     | Añadir o modificar tests. |
-| `chore`    | Tareas de mantenimiento (deps, config, scripts). |
-| `ci`       | Cambios en CI/CD. |
-| `build`    | Cambios en el sistema de build o dependencias externas. |
+| `refactor` | Cambio de código que no añade funcionalidad ni corrige un bug.           |
+| `perf`     | Mejora de rendimiento.                                                   |
+| `test`     | Añadir o modificar tests.                                                |
+| `chore`    | Tareas de mantenimiento (deps, config, scripts).                         |
+| `ci`       | Cambios en CI/CD.                                                        |
+| `build`    | Cambios en el sistema de build o dependencias externas.                  |
+
 
 ### Buenas prácticas
 
