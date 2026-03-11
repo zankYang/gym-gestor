@@ -14,11 +14,13 @@
     "dev": "node ace serve --hmr",
     "test": "node ace test",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "review": "pnpm lint && pnpm format && pnpm typecheck",
-    "review:fix": "pnpm lint --fix && pnpm format --write && pnpm typecheck --fix",
-    "review:test": "pnpm lint --fix && pnpm format --write && pnpm typecheck && pnpm test"
+    "review": "pnpm lint && pnpm format:check && pnpm typecheck",
+    "review:fix": "pnpm lint:fix && pnpm format && pnpm typecheck",
+    "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
