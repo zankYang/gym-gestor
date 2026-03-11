@@ -6,38 +6,30 @@ Sistema de gestión para gimnasios.
 
 ### Entorno de ejecución
 
-
 | Tecnología  | Versión                |
 | ----------- | ---------------------- |
 | **Node.js** | 24.14.x (ver `.nvmrc`) |
 
-
 ### Backend
-
 
 | Tecnología     | Versión |
 | -------------- | ------- |
 | **AdonisJS**   | 7.x     |
 | **TypeScript** | 5.9.x   |
 
-
 ### Base de datos
-
 
 | Tecnología     | Versión |
 | -------------- | ------- |
 | **PostgreSQL** | 18      |
 
-
 ### Desarrollo y calidad de código
-
 
 | Tecnología       | Versión |
 | ---------------- | ------- |
 | **ESLint**       | ^10.0.2 |
 | **Prettier**     | ^3.8.1  |
 | **Japa** (tests) | ^5.x    |
-
 
 ---
 
@@ -78,7 +70,6 @@ Si no usas nvm, instala Node.js 24.14.x y luego ejecuta desde el paso 3.
 
 ## Scripts
 
-
 | Comando          | Descripción                    |
 | ---------------- | ------------------------------ |
 | `pnpm dev`       | Servidor de desarrollo con HMR |
@@ -89,13 +80,11 @@ Si no usas nvm, instala Node.js 24.14.x y luego ejecuta desde el paso 3.
 | `pnpm format`    | Formatear código               |
 | `pnpm typecheck` | Comprobar tipos TypeScript     |
 
-
 Para ejecutar solo un grupo de tests: `node ace test --group "Nombre del grupo"`.
 
 ## Migraciones
 
 Comandos típicos de Lucid (base de datos):
-
 
 | Comando                                          | Descripción                     |
 | ------------------------------------------------ | ------------------------------- |
@@ -104,14 +93,11 @@ Comandos típicos de Lucid (base de datos):
 | `node ace migration:status`                      | Ver estado de las migraciones   |
 | `node ace make:migration nombre_de_la_migracion` | Crear una nueva migración       |
 
-
 ## Comandos Ace (personalizados)
-
 
 | Comando                                                                                          | Descripción                                                  |
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `node ace create:superadmin --email=tu@email.com --fullName="Tu nombre" --password=tucontraseña` | Crear superadmin con flags personalizados (`-e`, `-n`, `-p`) |
-
 
 ## Contribución
 
@@ -124,14 +110,18 @@ La rama por defecto del repositorio es `**dev**`. Cualquier cambio que quieras i
 1. **Crear una rama** desde `dev` con tu trabajo (por ejemplo `feature/nombre` o `fix/descripcion`).
 2. **Abrir un Pull Request (PR)** hacia la rama `dev`. No se aceptan pushes directos a `dev`.
 3. **Revisión y aprobación**: el PR debe ser revisado y aprobado por al menos una persona con permisos. Para que un PR sea aprobado, debe incluir:
-  - **Tests**: pruebas (Japa) que cubran la funcionalidad o el fix que introduces.
-  - **Bruno**: colección o peticiones en [Bruno](https://www.usebruno.com/) para probar manualmente los endpoints o flujos afectados.
+
+- **Tests**: pruebas (Japa) que cubran la funcionalidad o el fix que introduces.
+- **Bruno**: colección o peticiones en [Bruno](https://www.usebruno.com/) para probar manualmente los endpoints o flujos afectados.
+
 4. **CI debe pasar**: el workflow de GitHub Actions (`.github/workflows/ci.yml`) se ejecuta en cada push y en cada PR hacia `main`, `develop` y `dev`. El CI ejecuta:
-  - `pnpm lint`
-  - `pnpm format:check`
-  - `pnpm typecheck`
-  - migraciones y `pnpm test`
-   El PR solo puede integrarse cuando el CI esté en verde.
+
+- `pnpm lint`
+- `pnpm format:check`
+- `pnpm typecheck`
+- migraciones y `pnpm test`
+  El PR solo puede integrarse cuando el CI esté en verde.
+
 5. **Merge**: una vez aprobado y con el CI en verde, se hace merge del PR a `dev`.
 
 En resumen: **todo cambio a `dev` pasa por un PR, con aprobación y con el CI en verde.**
@@ -167,7 +157,6 @@ Seguimos [Conventional Commits](https://www.conventionalcommits.org/) para mensa
 
 ### Tipos de commit
 
-
 | Tipo       | Uso                                                                      |
 | ---------- | ------------------------------------------------------------------------ |
 | `feat`     | Nueva funcionalidad.                                                     |
@@ -181,13 +170,12 @@ Seguimos [Conventional Commits](https://www.conventionalcommits.org/) para mensa
 | `ci`       | Cambios en CI/CD.                                                        |
 | `build`    | Cambios en el sistema de build o dependencias externas.                  |
 
-
 ### Buenas prácticas
 
 - **Un commit = un cambio lógico**: evita mezclar varias funcionalidades o fixes en un solo commit.
 - **Descripción en imperativo**: «añade login» en lugar de «añadido login» o «añadiendo login».
 - **Línea de asunto ≤ 72 caracteres**: facilita la lectura en logs y herramientas.
-- **Cuerpo opcional**: si hace falta contexto, usa el cuerpo del mensaje para explicar el *qué* y el *por qué*.
+- **Cuerpo opcional**: si hace falta contexto, usa el cuerpo del mensaje para explicar el _qué_ y el _por qué_.
 - **Breaking changes**: si rompes compatibilidad, indica en el pie: `BREAKING CHANGE: descripción` o usa `!` tras el tipo/ámbito (ej. `feat(api)!: cambia contrato del endpoint`).
 
 ### Ejemplos

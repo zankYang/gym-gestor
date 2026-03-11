@@ -1,19 +1,19 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateGymValidator } from '#validators/gym'
-import Gym from '#models/gym'
+import Tenant from '#models/tenant'
 
 export default class UpdateGymController {
   /**
    * Actualiza un gym por id. Solo superadmin puede gestionar cualquier gym.
    */
   async update({ params, request, response }: HttpContext) {
-    const gym = await Gym.notDeleted().where('id', params.id).firstOrFail()
+    const tenant = await Tenant.notDeleted().where('id', params.id).firstOrFail()
     const payload = await request.validateUsing(updateGymValidator)
 
-    if (payload.slug !== undefined && payload.slug !== gym.slug) {
-      const existing = await Gym.notDeleted()
+    if (payload.slug !== undefined && payload.slug !== tenant.slug) {
+      const existing = await Tenant.notDeleted()
         .where('slug', payload.slug)
-        .whereNot('id', gym.id)
+        .whereNot('id', tenant.id)
         .first()
       if (existing) {
         return response.badRequest({
@@ -22,12 +22,12 @@ export default class UpdateGymController {
       }
     }
 
-    gym.merge(payload)
-    await gym.save()
+    tenant.merge(payload)
+    await tenant.save()
 
     return response.ok({
       message: 'Gym actualizado correctamente',
-      data: gym,
+      data: tenant,
     })
   }
 }

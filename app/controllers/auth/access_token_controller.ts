@@ -13,7 +13,7 @@ export default class AccessTokenController {
         message: 'Usuario no encontrado',
       })
     }
-    const isPasswordValid = await hash.verify(user.password, password)
+    const isPasswordValid = await hash.verify(user.passwordHash, password)
     if (!isPasswordValid) {
       return response.status(401).send({
         message: 'Contraseña incorrecta',

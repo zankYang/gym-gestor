@@ -1,17 +1,23 @@
-import { ClientSchema } from '#database/schema'
+import { ClientMembershipSchema } from '#database/schema'
 import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Tenant from '#models/tenant'
+import Client from '#models/client'
+import MembershipPlan from '#models/membership_plan'
 import Branch from '#models/branch'
 import User from '#models/user'
-import ClientMembership from '#models/client_membership'
+import Payment from '#models/payment'
 import Attendance from '#models/attendance'
-import Routine from '#models/routine'
-import ClassReservation from '#models/class_reservation'
 
-export default class Client extends ClientSchema {
+export default class ClientMembership extends ClientMembershipSchema {
   @belongsTo(() => Tenant)
   declare tenant: BelongsTo<typeof Tenant>
+
+  @belongsTo(() => Client)
+  declare client: BelongsTo<typeof Client>
+
+  @belongsTo(() => MembershipPlan)
+  declare membershipPlan: BelongsTo<typeof MembershipPlan>
 
   @belongsTo(() => Branch)
   declare branch: BelongsTo<typeof Branch>
@@ -22,15 +28,9 @@ export default class Client extends ClientSchema {
   @belongsTo(() => User, { foreignKey: 'updatedBy' })
   declare updatedByUser: BelongsTo<typeof User>
 
-  @hasMany(() => ClientMembership)
-  declare clientMemberships: HasMany<typeof ClientMembership>
+  @hasMany(() => Payment)
+  declare payments: HasMany<typeof Payment>
 
   @hasMany(() => Attendance)
   declare attendances: HasMany<typeof Attendance>
-
-  @hasMany(() => Routine)
-  declare routines: HasMany<typeof Routine>
-
-  @hasMany(() => ClassReservation)
-  declare classReservations: HasMany<typeof ClassReservation>
 }
