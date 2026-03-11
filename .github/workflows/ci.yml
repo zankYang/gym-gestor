@@ -2,46 +2,53 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - dev
+    branches: [main, develop, dev]
   pull_request:
-    branches:
-      - main
-      - develop
-      - dev
+    branches: [main, develop, dev]
 
 jobs:
   quality:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: gym_gestor_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d gym_gestor_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-      - name: Instalar pnpm
-        uses: pnpm/action-setup@v4
+    env:
+      NODE_ENV: test
+      DB_CONNECTION: pg
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: gym_gestor_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
 
-      - name: Instalar dependencias
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Verificar formato
-        run: pnpm format:check
-
-      - name: Verificar tipos
-        run: pnpm typecheck
-
-      - name: Ejecutar tests
-        run: pnpm test
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: node ace migration:run --force
+      - run: pnpm test
