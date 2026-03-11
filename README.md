@@ -99,6 +99,18 @@ Comandos típicos de Lucid (base de datos):
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | `node ace create:superadmin --email=tu@email.com --fullName="Tu nombre" --password=tucontraseña` | Crear superadmin con flags personalizados (`-e`, `-n`, `-p`) |
 
+## Documentación útil
+
+- **TypeScript**: tipos y características del lenguaje \(`https://www.typescriptlang.org/docs/`\)
+- **AdonisJS**: documentación oficial del framework \(`https://docs.adonisjs.com/introduction`\)
+- **Lucid (ORM de AdonisJS)**: documentación oficial \(`https://lucid.adonisjs.com/docs/introduction`\)
+- **Faker.js**: generación de datos falsos para seeds y tests \(`https://fakerjs.dev/api/`\)
+- **Japa**: runner de tests usado en el proyecto \(`https://japa.dev/docs/introduction`\)
+- **PostgreSQL**: documentación oficial de la base de datos \(`https://www.postgresql.org/docs/18/index.html`\)
+- **ESLint**: reglas y configuración de linting \(`https://eslint.org/docs/latest/`\)
+- **Prettier**: formateador de código \(`https://prettier.io/docs/en/`\)
+- **Node.js**: documentación de la versión LTS usada \(`https://nodejs.org/docs/latest-v24.x/api/`\)
+
 ## Contribución
 
 Antes de abrir un PR: `pnpm lint`, `pnpm typecheck` y `pnpm test` deben pasar.
