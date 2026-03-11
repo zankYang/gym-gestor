@@ -27,12 +27,12 @@ jobs:
 
     env:
       NODE_ENV: test
-      DB_CONNECTION: pg
-      DB_HOST: 127.0.0.1
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_DATABASE: gym_gestor_test
+      PG_CONNECTION: pg
+      PG_HOST: 127.0.0.1
+      PG_PORT=5432
+      PG_USER=postgres
+      PG_PASSWORD=postgres
+      PG_DB_NAME=gym_gestor
 
     steps:
       - uses: actions/checkout@v4
