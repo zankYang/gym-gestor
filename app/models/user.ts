@@ -20,8 +20,8 @@ export default class User extends UserSchema {
     await this.save()
   }
 
-  static verifyCredentials = async (email: string, password: string) => {
-    const user = await User.query().where('email', email).first()
+  static verifyCredentials = async (email: string, password: string, tenantId: number) => {
+    const user = await User.notDeleted().where('tenant_id', tenantId).where('email', email).first()
     if (!user) {
       throw new AuthException()
     }

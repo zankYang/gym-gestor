@@ -53,3 +53,4 @@ router
       .as('auth')
   })
   .prefix('/api')
+  .use([middleware.identifyTenant()])

@@ -16,9 +16,14 @@ export default class HttpExceptionHandler extends ExceptionHandler {
   async handle(error: unknown, ctx: HttpContext) {
     if (error instanceof AuthException) {
       return ctx.response.status(error.status).send({
-        message: error.message,
+        errors: [
+          {
+            message: error.message,
+          },
+        ],
       })
     }
+
     return super.handle(error, ctx)
   }
 
