@@ -1,9 +1,10 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import User from '#models/user'
+import Role from '#models/role'
 import hash from '@adonisjs/core/services/hash'
 import { CommandOptions } from '@adonisjs/core/types/ace'
 import { Status } from '#enums/status_enum'
-import { Role } from '#enums/role_enum'
+import { Role as RoleEnum } from '#enums/role_enum'
 
 export default class CreateSuperadmin extends BaseCommand {
   static commandName = 'create:superadmin'
@@ -19,8 +20,11 @@ export default class CreateSuperadmin extends BaseCommand {
   })
   declare email: string
 
-  @flags.string({ description: 'Nombre completo', alias: 'n', default: 'superadmin' })
-  declare fullName: string
+  @flags.string({ description: 'Nombre', alias: 'n', default: 'Super' })
+  declare firstName: string
+
+  @flags.string({ description: 'Apellido', alias: 'l', default: 'Admin' })
+  declare lastName: string
 
   @flags.string({
     description: 'Contraseña (mínimo 8 caracteres)',
@@ -29,14 +33,15 @@ export default class CreateSuperadmin extends BaseCommand {
   })
   declare password: string
 
+  @flags.number({
+    description: 'ID del tenant al que pertenece el superadmin',
+    alias: 't',
+  })
+  declare tenantId: number
+
   async run() {
     if (!this.email?.trim()) {
       this.logger.error('El flag --email es obligatorio.')
-      this.exitCode = 1
-      return
-    }
-    if (!this.fullName?.trim()) {
-      this.logger.error('El flag --fullName es obligatorio.')
       this.exitCode = 1
       return
     }
@@ -46,21 +51,31 @@ export default class CreateSuperadmin extends BaseCommand {
       return
     }
 
-    const existing = await User.query().whereNull('gym_id').where('email', this.email).first()
+    const existing = await User.query().where('email', this.email).first()
     if (existing) {
-      this.logger.error(`Ya existe un superadmin con el email "${this.email}".`)
+      this.logger.error(`Ya existe un usuario con el email "${this.email}".`)
       this.exitCode = 1
       return
     }
 
-    const password = await hash.make(this.password)
+    const superadminRole = await Role.findBy('code', RoleEnum.SUPERADMIN)
+    if (!superadminRole) {
+      this.logger.error(
+        'No se encontró el rol superadmin en la base de datos. Ejecuta los seeders primero.'
+      )
+      this.exitCode = 1
+      return
+    }
+
+    const passwordHash = await hash.make(this.password)
 
     const user = await User.create({
-      gymId: null,
-      fullName: this.fullName.trim(),
+      tenantId: this.tenantId,
+      firstName: this.firstName.trim(),
+      lastName: this.lastName.trim(),
       email: this.email.trim(),
-      password,
-      role: Role.SUPERADMIN,
+      passwordHash,
+      roleId: superadminRole.id,
       status: Status.ACTIVE,
     })
 

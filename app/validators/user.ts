@@ -2,19 +2,22 @@ import vine from '@vinejs/vine'
 import { Role } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
-const fullName = () => vine.string().trim().minLength(3).maxLength(100)
+const firstName = () => vine.string().trim().minLength(1).maxLength(100)
+const lastName = () => vine.string().trim().minLength(1).maxLength(100)
 const email = () => vine.string().email().maxLength(150)
 const password = () => vine.string().minLength(8).maxLength(20)
 const roleEnum = () => vine.string().in([Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER])
 const statusEnum = () => vine.string().in([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED])
 const id = () => vine.number().exists({ table: 'users', column: 'id' })
+
 /**
  * Validator para crear un usuario (admin/superadmin).
- * El email se valida como único por gym en el controlador.
+ * El email se valida como único por tenant en el controlador.
  */
 export const createUserValidator = vine.create({
-  gymId: vine.number().exists({ table: 'gyms', column: 'id' }),
-  fullName: fullName(),
+  tenantId: vine.number().exists({ table: 'tenants', column: 'id' }),
+  firstName: firstName(),
+  lastName: lastName(),
   email: email(),
   password: password(),
   role: roleEnum(),
@@ -47,7 +50,8 @@ export const loginValidator = vine.create({
  * Validator para actualizar un usuario. Todos los campos opcionales.
  */
 export const updateUserValidator = vine.create({
-  fullName: fullName().optional(),
+  firstName: firstName().optional(),
+  lastName: lastName().optional(),
   email: email().optional(),
   password: password().optional(),
   role: roleEnum().optional(),

@@ -27,6 +27,14 @@ jobs:
 
     env:
       NODE_ENV: test
+
+      HOST: 127.0.0.1
+      PORT: 3333
+      LOG_LEVEL: info
+      APP_KEY: base64:abcdefghijklmnopqrstuvwxyz1234567890ABCD
+      APP_URL: http://localhost:3333
+      SESSION_DRIVER: cookie
+
       PG_CONNECTION: pg
       PG_HOST: 127.0.0.1
       PG_PORT: 5432

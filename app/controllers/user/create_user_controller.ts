@@ -1,25 +1,30 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { createUserValidator } from '#validators/user'
 import User from '#models/user'
+import Role from '#models/role'
 import hash from '@adonisjs/core/services/hash'
 import { Status } from '#enums/status_enum'
-import { Role } from '#enums/role_enum'
+import { Role as RoleEnum } from '#enums/role_enum'
 
 export default class CreateUserController {
   async store({ auth, request, response }: HttpContext) {
     const currentUser = auth.getUserOrFail()
+    await currentUser.load((preloader) => preloader.load('role'))
+    const currentRole = (currentUser.role as any).code as string
+
     const payload = await request.validateUsing(createUserValidator)
+
     const existingUser = await User.notDeleted()
       .where('email', payload.email)
-      .where('gym_id', payload.gymId)
+      .where('tenant_id', payload.tenantId)
       .first()
 
-    if (currentUser.role !== Role.SUPERADMIN && payload.role === Role.ADMIN) {
+    if (currentRole !== RoleEnum.SUPERADMIN && payload.role === RoleEnum.ADMIN) {
       return response.status(403).send({
         errors: [{ message: 'No tienes permisos para crear admins' }],
       })
     }
-    if (currentUser.role === Role.ADMIN && payload.gymId !== currentUser.gymId) {
+    if (currentRole === RoleEnum.ADMIN && payload.tenantId !== currentUser.tenantId) {
       return response
         .status(403)
         .send({ errors: [{ message: 'No tienes permisos para crear usuarios en este gym' }] })
@@ -30,14 +35,16 @@ export default class CreateUserController {
         .send({ errors: [{ message: 'Ya existe un usuario con ese email en este gym' }] })
     }
 
-    const hashedPassword = await hash.make(payload.password)
+    const roleRecord = await Role.findByOrFail('code', payload.role)
+    const passwordHash = await hash.make(payload.password)
 
     const user = await User.create({
-      gymId: payload.gymId,
-      fullName: payload.fullName,
+      tenantId: payload.tenantId,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
       email: payload.email,
-      password: hashedPassword,
-      role: payload.role,
+      passwordHash,
+      roleId: roleRecord.id,
       status: Status.ACTIVE,
     })
 

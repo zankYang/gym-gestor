@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Gym from '#models/gym'
+import Tenant from '#models/tenant'
 
 export default class DestroyGymController {
   /**
@@ -7,8 +7,8 @@ export default class DestroyGymController {
    * El registro permanece en BD con deleted_at; deja de aparecer en listados.
    */
   async destroy({ params, response }: HttpContext) {
-    const gym = await Gym.notDeleted().where('id', params.id).firstOrFail()
-    await gym.softDelete()
+    const tenant = await Tenant.notDeleted().where('id', params.id).firstOrFail()
+    await tenant.softDelete()
     return response.status(200).send({
       message: 'Gym dado de baja correctamente',
     })
