@@ -21,7 +21,7 @@
     "review": "pnpm lint && pnpm format:check && pnpm typecheck",
     "review:fix": "pnpm lint:fix && pnpm format && pnpm typecheck",
     "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
-    "redo:migrations": "node ace migration:refresh --seed && prettier"
+    "db:setup": "node ace migration:refresh --seed && pnpm review:fix && pnpm sync:permissions"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
@@ -32,6 +32,7 @@
     "#listeners/*": "./app/listeners/*.js",
     "#events/*": "./app/events/*.js",
     "#enums/*": "./app/enums/*.js",
+    "#factories/*": "./database/factories/*.js",
     "#generated/*": "./.adonisjs/server/*.js",
     "#middleware/*": "./app/middleware/*.js",
     "#transformers/*": "./app/transformers/*.js",

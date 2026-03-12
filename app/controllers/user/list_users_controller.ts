@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 
 export default class ListUsersController {
   async index({ auth, response, request }: HttpContext) {
@@ -16,7 +16,7 @@ export default class ListUsersController {
     const sortBy = (request.input('sortBy') ?? 'created_at').toString()
     let tenantIdFilter: number | undefined
 
-    if (currentRole === Role.SUPERADMIN) {
+    if (currentRole === RoleCode.SUPERADMIN) {
       tenantIdFilter = request.input('tenantId') as number
     }
 

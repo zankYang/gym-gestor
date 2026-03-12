@@ -1,12 +1,12 @@
 import vine from '@vinejs/vine'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
 const firstName = () => vine.string().trim().minLength(1).maxLength(100)
 const lastName = () => vine.string().trim().minLength(1).maxLength(100)
 const email = () => vine.string().email().maxLength(150)
 const password = () => vine.string().minLength(8).maxLength(20)
-const roleEnum = () => vine.string().in([Role.ADMIN, Role.RECEPTIONIST, Role.TRAINER])
+const roleEnum = () => vine.string().in([RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH])
 const statusEnum = () => vine.string().in([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED])
 const id = () => vine.number().exists({ table: 'users', column: 'id' })
 

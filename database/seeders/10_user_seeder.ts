@@ -1,16 +1,16 @@
 import Role from '#models/role'
 import Tenant from '#models/tenant'
 import User from '#models/user'
-import { Role as RoleEnum } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 import hash from '@adonisjs/core/services/hash'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class UserSeeder extends BaseSeeder {
   async run() {
-    const adminRole = await Role.findByOrFail('code', RoleEnum.ADMIN)
-    const receptionistRole = await Role.findByOrFail('code', RoleEnum.RECEPTIONIST)
-    const trainerRole = await Role.findByOrFail('code', RoleEnum.TRAINER)
+    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
+    const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
+    const trainerRole = await Role.findByOrFail('code', RoleCode.COACH)
 
     const tenants = await Tenant.all()
 

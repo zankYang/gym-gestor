@@ -6,7 +6,8 @@ import Role from '#models/role'
 export default class Permission extends PermissionSchema {
   @manyToMany(() => Role, {
     pivotTable: 'role_permissions',
-    pivotTimestamps: { createdAt: true, updatedAt: false },
+    pivotForeignKey: 'permission_id',
+    pivotRelatedForeignKey: 'role_id',
   })
   declare roles: ManyToMany<typeof Role>
 }

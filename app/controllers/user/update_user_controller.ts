@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import Role from '#models/role'
 import { updateUserValidator } from '#validators/user'
-import { Role as RoleEnum } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 import hash from '@adonisjs/core/services/hash'
 
 export default class UpdateUserController {
@@ -15,7 +15,7 @@ export default class UpdateUserController {
 
     let query = User.notDeleted().where('id', params.id)
 
-    if (currentRole !== RoleEnum.SUPERADMIN) {
+    if (currentRole !== RoleCode.SUPERADMIN) {
       query = query.where('tenant_id', currentUser.tenantId)
     }
 

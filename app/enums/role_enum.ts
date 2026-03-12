@@ -1,6 +1,8 @@
-export enum Role {
-  SUPERADMIN = 'Administrador global',
-  ADMIN = 'Administrador',
-  RECEPTIONIST = 'Recepcionista',
-  TRAINER = 'Entrenador',
+export enum RoleCode {
+  SUPERADMIN = 'superadmin',
+  ADMIN = 'admin',
+  RECEPTIONIST = 'receptionist',
+  COACH = 'coach',
+  MEMBER = 'member',
+  GUEST = 'guest',
 }

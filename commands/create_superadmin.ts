@@ -4,7 +4,7 @@ import Role from '#models/role'
 import hash from '@adonisjs/core/services/hash'
 import { CommandOptions } from '@adonisjs/core/types/ace'
 import { Status } from '#enums/status_enum'
-import { Role as RoleEnum } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 
 export default class CreateSuperadmin extends BaseCommand {
   static commandName = 'create:superadmin'
@@ -58,7 +58,7 @@ export default class CreateSuperadmin extends BaseCommand {
       return
     }
 
-    const superadminRole = await Role.findBy('code', RoleEnum.SUPERADMIN)
+    const superadminRole = await Role.findBy('code', RoleCode.SUPERADMIN)
     if (!superadminRole) {
       this.logger.error(
         'No se encontró el rol superadmin en la base de datos. Ejecuta los seeders primero.'
