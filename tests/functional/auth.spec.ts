@@ -38,7 +38,6 @@ test.group('Auth', (group) => {
         email: 'test@test.com',
         password: '12345678',
       })
-    console.log(response.body())
     response.assertStatus(200)
     const body = response.body()! as Response
     assert.deepEqual(body, {
@@ -68,7 +67,6 @@ test.group('Auth', (group) => {
         email: 'test@test.com',
         password: '12345679',
       })
-    console.log(response.body())
     response.assertStatus(401)
 
     const bodyUser = response.body()! as ResponseError
@@ -87,21 +85,15 @@ test.group('Auth', (group) => {
       code: RoleCode.ADMIN,
       description: 'Administrador del gimnasio, acceso completo dentro del tenant',
     })
-    const user = await UserFactory.with('tenant')
+    await UserFactory.with('tenant')
       .merge({ roleId: role.id, email: 'test@test.com', passwordHash: '12345678' })
       .create()
     await TenantFactory.merge({ slug: 'slug-falso' }).create()
-    const gyms = await Tenant.all()
-    console.log(user.tenantId)
-    for (const gym of gyms) {
-      console.log(gym.id)
-      console.log(gym.slug)
-    }
+
     const response = await client.post('/api/auth/login').header('Host', `slug-falso`).json({
       email: 'test@test.com',
       password: '12345678',
     })
-    console.log(response.body())
     response.assertStatus(401)
     const bodyUser = response.body()! as ResponseError
     assert.deepEqual(bodyUser, {
@@ -110,6 +102,27 @@ test.group('Auth', (group) => {
           message: 'El correo o la contraseña son incorrectos',
         },
       ],
+    })
+  })
+
+  test('logout', async ({ assert, client }) => {
+    const role = await Role.create({
+      name: RoleCode.ADMIN,
+      code: RoleCode.ADMIN,
+      description: 'Administrador del gimnasio, acceso completo dentro del tenant',
+    })
+    const user = await UserFactory.with('tenant')
+      .merge({ roleId: role.id, email: 'test@test.com', passwordHash: '12345678' })
+      .create()
+    const gyms = await Tenant.all()
+    const response = await client
+      .post('/api/auth/logout')
+      .header('Host', `${gyms[0].slug}.localhost:3333`)
+      .loginAs(user)
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.deepEqual(body, {
+      message: 'Desconectado correctamente',
     })
   })
 })
