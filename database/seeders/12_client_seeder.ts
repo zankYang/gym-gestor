@@ -16,6 +16,8 @@ export default class ClientSeeder extends BaseSeeder {
         .orderBy('id', 'asc')
         .first()
 
+      if (!adminUser) continue
+
       const clientCount = 10
 
       for (let i = 0; i < clientCount; i++) {
@@ -23,7 +25,7 @@ export default class ClientSeeder extends BaseSeeder {
         await ClientFactory.merge({
           tenantId: tenant.id,
           branchId: branch?.id ?? null,
-          createdBy: adminUser?.id ?? 1,
+          createdBy: adminUser.id,
         }).create()
       }
     }

@@ -1,6 +1,7 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Setting from '#models/setting'
 import Tenant from '#models/tenant'
+import db from '@adonisjs/lucid/services/db'
 
 const defaultSettings = [
   {
@@ -61,10 +62,21 @@ export default class SettingSeeder extends BaseSeeder {
 
     for (const tenant of tenants) {
       for (const setting of defaultSettings) {
-        await Setting.firstOrCreate(
-          { tenantId: tenant.id, key: setting.key },
-          { ...setting, tenantId: tenant.id }
-        )
+        const exists = await Setting.query()
+          .where('tenant_id', tenant.id)
+          .where('key', setting.key)
+          .first()
+
+        if (exists) continue
+
+        await db.table('settings').insert({
+          tenant_id: tenant.id,
+          key: setting.key,
+          value: JSON.stringify(setting.value),
+          description: setting.description,
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
       }
     }
   }

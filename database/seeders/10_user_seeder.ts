@@ -1,6 +1,6 @@
-import { UserFactory } from '#database/factories/user_factory'
 import Role from '#models/role'
 import Tenant from '#models/tenant'
+import User from '#models/user'
 import { Role as RoleEnum } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 import hash from '@adonisjs/core/services/hash'
@@ -34,13 +34,18 @@ export default class UserSeeder extends BaseSeeder {
       ]
 
       for (const user of users) {
-        await UserFactory.merge({
-          tenantId: tenant.id,
-          email: user.email,
-          passwordHash: await hash.make(user.password),
-          roleId: user.roleId,
-          status: Status.ACTIVE,
-        }).create()
+        await User.firstOrCreate(
+          { tenantId: tenant.id, email: user.email },
+          {
+            tenantId: tenant.id,
+            email: user.email,
+            passwordHash: await hash.make(user.password),
+            roleId: user.roleId,
+            firstName: user.email.split('.')[0],
+            lastName: 'Gymgestor',
+            status: Status.ACTIVE,
+          }
+        )
       }
     }
   }

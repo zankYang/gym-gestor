@@ -1,5 +1,5 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
-import { GymFactory } from '#database/factories/gym_factory'
+import Tenant from '#models/tenant'
 import { Status } from '#enums/status_enum'
 
 export default class GymSeeder extends BaseSeeder {
@@ -13,7 +13,7 @@ export default class GymSeeder extends BaseSeeder {
     ]
 
     for (const gym of gyms) {
-      await GymFactory.merge({ name: gym.name, slug: gym.slug, status: gym.status }).create()
+      await Tenant.firstOrCreate({ slug: gym.slug }, { name: gym.name, slug: gym.slug, status: gym.status })
     }
   }
 }
