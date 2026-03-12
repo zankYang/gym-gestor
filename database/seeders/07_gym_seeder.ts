@@ -13,7 +13,10 @@ export default class GymSeeder extends BaseSeeder {
     ]
 
     for (const gym of gyms) {
-      await Tenant.firstOrCreate({ slug: gym.slug }, { name: gym.name, slug: gym.slug, status: gym.status })
+      await Tenant.firstOrCreate(
+        { slug: gym.slug },
+        { name: gym.name, slug: gym.slug, status: gym.status }
+      )
     }
   }
 }

@@ -21,7 +21,7 @@ export default class extends BaseSchema {
       table.text('address').nullable()
 
       table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
-      table.text('config').nullable()
+      table.jsonb('config').nullable()
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())

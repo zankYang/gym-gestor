@@ -4,10 +4,9 @@ import { Status } from '#enums/status_enum'
 
 export const BranchFactory = factory
   .define(Branch, ({ faker }) => {
-    const name = faker.company.name()
     return {
       tenantId: 1,
-      name,
+      name: faker.company.name(),
       code: faker.string.alphanumeric(6).toUpperCase(),
       phone: faker.phone.number({ style: 'international' }),
       email: faker.internet.email(),

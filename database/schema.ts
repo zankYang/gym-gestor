@@ -981,7 +981,7 @@ export class TenantSchema extends BaseModel {
   @column()
   declare status: string
   @column()
-  declare config: string | null
+  declare config: any | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
