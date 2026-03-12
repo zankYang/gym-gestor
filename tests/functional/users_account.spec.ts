@@ -20,26 +20,38 @@ type ResponseError = {
 }
 
 async function createRoles() {
-  const superadminRole = await Role.create({
-    name: 'Super Admin',
-    code: RoleEnum.SUPERADMIN,
-    description: 'Acceso total al sistema',
-  })
-  const adminRole = await Role.create({
-    name: 'Admin',
-    code: RoleEnum.ADMIN,
-    description: 'Administrador de gym',
-  })
-  const receptionistRole = await Role.create({
-    name: 'Recepcionista',
-    code: RoleEnum.RECEPTIONIST,
-    description: 'Recepcionista',
-  })
-  const trainerRole = await Role.create({
-    name: 'Entrenador',
-    code: RoleEnum.TRAINER,
-    description: 'Entrenador',
-  })
+  const superadminRole = await Role.firstOrCreate(
+    { code: RoleEnum.SUPERADMIN },
+    {
+      name: RoleEnum.SUPERADMIN,
+      code: RoleEnum.SUPERADMIN,
+      description: 'Acceso total al sistema, gestión de todos los tenants',
+    }
+  )
+  const adminRole = await Role.firstOrCreate(
+    { code: RoleEnum.ADMIN },
+    {
+      name: RoleEnum.ADMIN,
+      code: RoleEnum.ADMIN,
+      description: 'Administrador del gimnasio, acceso completo dentro del tenant',
+    }
+  )
+  const receptionistRole = await Role.firstOrCreate(
+    { code: RoleEnum.RECEPTIONIST },
+    {
+      name: RoleEnum.RECEPTIONIST,
+      code: RoleEnum.RECEPTIONIST,
+      description: 'Gestión de clientes, cobros y asistencias',
+    }
+  )
+  const trainerRole = await Role.firstOrCreate(
+    { code: RoleEnum.TRAINER },
+    {
+      name: RoleEnum.TRAINER,
+      code: RoleEnum.TRAINER,
+      description: 'Gestión de rutinas y clases',
+    }
+  )
   return { superadminRole, adminRole, receptionistRole, trainerRole }
 }
 

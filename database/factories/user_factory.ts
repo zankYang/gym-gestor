@@ -13,7 +13,7 @@ export const UserFactory = factory
       email: faker.internet.email(),
       passwordHash,
       roleId: 1,
-      status: faker.helpers.enumValue(Status),
+      status: faker.helpers.arrayElement([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]),
     }
   })
   .build()

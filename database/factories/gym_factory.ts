@@ -14,7 +14,7 @@ export const GymFactory = factory
       email: faker.internet.email(),
       phone: faker.phone.number({ style: 'international' }),
       address: faker.location.streetAddress(),
-      status: faker.helpers.enumValue(Status),
+      status: faker.helpers.arrayElement([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]),
     }
   })
   .build()

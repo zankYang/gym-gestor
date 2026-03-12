@@ -1,5 +1,6 @@
 import { UserFactory } from '#database/factories/user_factory'
 import Role from '#models/role'
+import Tenant from '#models/tenant'
 import { Role as RoleEnum } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 import hash from '@adonisjs/core/services/hash'
@@ -11,19 +12,36 @@ export default class UserSeeder extends BaseSeeder {
     const receptionistRole = await Role.findByOrFail('code', RoleEnum.RECEPTIONIST)
     const trainerRole = await Role.findByOrFail('code', RoleEnum.TRAINER)
 
-    const users: { email: string; password: string; roleId: number }[] = [
-      { email: 'admin@gymgestor.com', password: '12345678', roleId: adminRole.id },
-      { email: 'user@gymgestor.com', password: '12345678', roleId: receptionistRole.id },
-      { email: 'user2@gymgestor.com', password: '12345678', roleId: trainerRole.id },
-    ]
+    const tenants = await Tenant.all()
 
-    for (const user of users) {
-      await UserFactory.merge({
-        email: user.email,
-        passwordHash: await hash.make(user.password),
-        roleId: user.roleId,
-        status: Status.ACTIVE,
-      }).create()
+    for (const tenant of tenants) {
+      const users: { email: string; password: string; roleId: number }[] = [
+        {
+          email: `admin.${tenant.slug}@gymgestor.com`,
+          password: '12345678',
+          roleId: adminRole.id,
+        },
+        {
+          email: `recepcion.${tenant.slug}@gymgestor.com`,
+          password: '12345678',
+          roleId: receptionistRole.id,
+        },
+        {
+          email: `entrenador.${tenant.slug}@gymgestor.com`,
+          password: '12345678',
+          roleId: trainerRole.id,
+        },
+      ]
+
+      for (const user of users) {
+        await UserFactory.merge({
+          tenantId: tenant.id,
+          email: user.email,
+          passwordHash: await hash.make(user.password),
+          roleId: user.roleId,
+          status: Status.ACTIVE,
+        }).create()
+      }
     }
   }
 }
