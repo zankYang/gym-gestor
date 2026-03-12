@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "review": "pnpm lint && pnpm format:check && pnpm typecheck",
     "review:fix": "pnpm lint:fix && pnpm format && pnpm typecheck",
-    "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+    "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "redo:migrations": "node ace migration:refresh --seed && prettier"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

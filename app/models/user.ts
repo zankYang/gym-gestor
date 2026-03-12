@@ -8,6 +8,7 @@ import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import Tenant from '#models/tenant'
 import Role from '#models/role'
 import Branch from '#models/branch'
+import { AuthException } from '#exceptions/auth_exceptions'
 
 export default class User extends UserSchema {
   static notDeleted(): ModelQueryBuilderContract<typeof User, User> {
@@ -22,11 +23,11 @@ export default class User extends UserSchema {
   static verifyCredentials = async (email: string, password: string) => {
     const user = await User.query().where('email', email).first()
     if (!user) {
-      throw new Error('User not found')
+      throw new AuthException()
     }
     const isPasswordValid = await hash.verify(user.passwordHash, password)
     if (!isPasswordValid) {
-      throw new Error('Invalid password')
+      throw new AuthException()
     }
     return user
   }

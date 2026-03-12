@@ -1,5 +1,6 @@
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
+import { AuthException } from '#exceptions/auth_exceptions'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -13,6 +14,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    if (error instanceof AuthException) {
+      return ctx.response.status(error.status).send({
+        message: error.message,
+      })
+    }
     return super.handle(error, ctx)
   }
 

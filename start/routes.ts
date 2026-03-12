@@ -33,6 +33,7 @@ router
     router
       .group(() => {
         router.get('/', [controllers.user.ListUsers, 'index'])
+
         router.post('/', [controllers.user.CreateUser, 'store'])
         router.get('/:id', [controllers.user.ShowUser, 'show'])
         router.patch('/:id', [controllers.user.UpdateUser, 'update'])
