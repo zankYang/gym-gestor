@@ -1,5 +1,5 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 
 export default class extends BaseSchema {
   protected tableName = 'roles'
@@ -16,7 +16,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at')
 
       table.check(
-        `name in ('${Role.SUPERADMIN}', '${Role.ADMIN}', '${Role.RECEPTIONIST}', '${Role.TRAINER}')`
+        `code in ('${RoleCode.SUPERADMIN}', '${RoleCode.ADMIN}', '${RoleCode.RECEPTIONIST}', '${RoleCode.COACH}')`
       )
     })
   }

@@ -4,7 +4,7 @@ import User from '#models/user'
 import Role from '#models/role'
 import hash from '@adonisjs/core/services/hash'
 import { Status } from '#enums/status_enum'
-import { Role as RoleEnum } from '#enums/role_enum'
+import { RoleCode as RoleEnum } from '#enums/role_enum'
 
 export default class CreateUserController {
   async store({ auth, request, response }: HttpContext) {

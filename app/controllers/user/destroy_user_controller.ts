@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 import { destroyUserValidator } from '#validators/user'
 
 export default class DestroyUserController {
@@ -14,15 +14,15 @@ export default class DestroyUserController {
     await user.load((preloader) => preloader.load('role'))
     const userRole = (user.role as any).code as string
 
-    if (currentRole === Role.ADMIN && user.tenantId !== currentUser.tenantId) {
+    if (currentRole === RoleCode.ADMIN && user.tenantId !== currentUser.tenantId) {
       return response
         .status(403)
         .send({ errors: [{ message: 'No puedes dar de baja usuarios de otro gym' }] })
     }
     if (
-      userRole === Role.SUPERADMIN ||
-      (userRole === Role.ADMIN && currentRole !== Role.SUPERADMIN) ||
-      (user.tenantId !== currentUser.tenantId && currentRole !== Role.SUPERADMIN)
+      userRole === RoleCode.SUPERADMIN ||
+      (userRole === RoleCode.ADMIN && currentRole !== RoleCode.SUPERADMIN) ||
+      (user.tenantId !== currentUser.tenantId && currentRole !== RoleCode.SUPERADMIN)
     ) {
       return response
         .status(403)

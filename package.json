@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "review": "pnpm lint && pnpm format:check && pnpm typecheck",
     "review:fix": "pnpm lint:fix && pnpm format && pnpm typecheck",
-    "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+    "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "db:setup": "node ace migration:fresh && node ace sync:permissions && node ace sync:roles && node ace db:seed && pnpm review:fix && pnpm review:test"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
@@ -31,6 +32,7 @@
     "#listeners/*": "./app/listeners/*.js",
     "#events/*": "./app/events/*.js",
     "#enums/*": "./app/enums/*.js",
+    "#factories/*": "./database/factories/*.js",
     "#generated/*": "./.adonisjs/server/*.js",
     "#middleware/*": "./app/middleware/*.js",
     "#transformers/*": "./app/transformers/*.js",

@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { showUserValidator } from '#validators/user'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 
 export default class ShowUserController {
   async show({ auth, params, response }: HttpContext) {
@@ -14,7 +14,7 @@ export default class ShowUserController {
     if (!user) {
       return response.status(404).send({ errors: [{ message: 'Usuario no encontrado' }] })
     }
-    if (currentRole === Role.ADMIN && user.tenantId !== currentUser.tenantId) {
+    if (currentRole === RoleCode.ADMIN && user.tenantId !== currentUser.tenantId) {
       return response
         .status(403)
         .send({ errors: [{ message: 'No puedes ver usuarios de otro gym' }] })

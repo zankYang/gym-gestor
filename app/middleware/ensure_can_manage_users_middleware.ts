@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import { Role } from '#enums/role_enum'
+import { RoleCode } from '#enums/role_enum'
 
-const ALLOWED_ROLES = [Role.SUPERADMIN, Role.ADMIN] as const
+const ALLOWED_ROLES = [RoleCode.SUPERADMIN, RoleCode.ADMIN] as const
 
 /**
  * Permite acceso solo a superadmin (gestión global) o admin (gestión de usuarios de su tenant).

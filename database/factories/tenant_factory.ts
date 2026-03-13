@@ -2,7 +2,7 @@ import factory from '@adonisjs/lucid/factories'
 import Tenant from '#models/tenant'
 import { Status } from '#enums/status_enum'
 
-export const GymFactory = factory
+export const TenantFactory = factory
   .define(Tenant, async ({ faker }) => {
     const name = faker.company.name()
     return {
