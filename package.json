@@ -21,7 +21,7 @@
     "review": "pnpm lint && pnpm format:check && pnpm typecheck",
     "review:fix": "pnpm lint:fix && pnpm format && pnpm typecheck",
     "review:test": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
-    "db:setup": "node ace migration:fresh && node ace sync:permissions && node ace sync:roles && node ace db:seed && pnpm review:fix && pnpm review:test"
+    "db:setup": "node ace migration:fresh && node ace sync:permissions && node ace sync:roles && node ace db:seed && node ace create:superadmin && pnpm review:fix && pnpm review:test"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
