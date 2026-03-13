@@ -1,4 +1,3 @@
-// commands/sync_permissions.ts
 import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 import Permission from '#models/permission'
@@ -16,6 +15,7 @@ export default class SyncPermissions extends BaseCommand {
     this.logger.info('Iniciando sincronización de permisos...')
 
     const permissions = [
+      // --- auth ---
       {
         code: PermissionCode.USERS_MANAGE,
         name: 'Gestionar Usuarios',
@@ -28,11 +28,13 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.AUTH,
         description: 'Asignar y modificar roles de usuarios',
       },
+
+      // --- clients ---
       {
         code: PermissionCode.CLIENTS_READ,
         name: 'Ver Socios',
         module: PermissionModule.CLIENTS,
-        description: 'Listado y búsqueda de miembros',
+        description: 'Listado y búsqueda de socios',
       },
       {
         code: PermissionCode.CLIENTS_WRITE,
@@ -47,6 +49,14 @@ export default class SyncPermissions extends BaseCommand {
         description: 'Dar de baja o eliminar socios',
       },
       {
+        code: PermissionCode.MEMBERSHIPS_MANAGE,
+        name: 'Gestionar Membresías',
+        module: PermissionModule.CLIENTS,
+        description: 'Alta, renovación y cancelación de membresías de socios',
+      },
+
+      // --- finance ---
+      {
         code: PermissionCode.PAYMENTS_READ,
         name: 'Ver Cobros',
         module: PermissionModule.FINANCE,
@@ -59,16 +69,30 @@ export default class SyncPermissions extends BaseCommand {
         description: 'Procesar pagos de mensualidades',
       },
       {
+        code: PermissionCode.PAYMENTS_CANCEL,
+        name: 'Anular Pago',
+        module: PermissionModule.FINANCE,
+        description: 'Anular o revertir pagos registrados',
+      },
+      {
         code: PermissionCode.PLANS_MANAGE,
         name: 'Gestionar Planes',
         module: PermissionModule.FINANCE,
         description: 'Configurar costos y beneficios de membresías',
       },
+
+      // --- operations ---
       {
         code: PermissionCode.ATTENDANCE_CHECKIN,
         name: 'Check-in Asistencia',
         module: PermissionModule.OPERATIONS,
-        description: 'Registro de entrada/salida en sucursal',
+        description: 'Registrar entrada/salida de socios en sucursal',
+      },
+      {
+        code: PermissionCode.ATTENDANCES_VIEW,
+        name: 'Ver Asistencias',
+        module: PermissionModule.OPERATIONS,
+        description: 'Consultar historial de asistencias',
       },
       {
         code: PermissionCode.BRANCH_MANAGE,
@@ -76,6 +100,8 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.OPERATIONS,
         description: 'Crear y configurar sucursales',
       },
+
+      // --- fitness ---
       {
         code: PermissionCode.CLASSES_MANAGE,
         name: 'Gestionar Clases',
@@ -88,6 +114,8 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.FITNESS,
         description: 'Alta y asignación de entrenadores',
       },
+
+      // --- workout ---
       {
         code: PermissionCode.ROUTINES_MANAGE,
         name: 'Gestionar Rutinas',
@@ -100,6 +128,8 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.WORKOUT,
         description: 'Catálogo de ejercicios y materiales',
       },
+
+      // --- system ---
       {
         code: PermissionCode.SETTINGS_MANAGE,
         name: 'Ajustes del Sistema',
@@ -111,6 +141,24 @@ export default class SyncPermissions extends BaseCommand {
         name: 'Ver Auditoría',
         module: PermissionModule.SYSTEM,
         description: 'Consultar registros de auditoría',
+      },
+      {
+        code: PermissionCode.REPORTS_VIEW,
+        name: 'Ver Reportes',
+        module: PermissionModule.SYSTEM,
+        description: 'Acceder a reportes y estadísticas del gimnasio',
+      },
+      {
+        code: PermissionCode.DOCUMENTS_MANAGE,
+        name: 'Gestionar Documentos',
+        module: PermissionModule.SYSTEM,
+        description: 'Subir y gestionar documentos del tenant',
+      },
+      {
+        code: PermissionCode.NOTIFICATIONS_MANAGE,
+        name: 'Gestionar Notificaciones',
+        module: PermissionModule.SYSTEM,
+        description: 'Enviar y gestionar notificaciones a socios',
       },
     ]
 
