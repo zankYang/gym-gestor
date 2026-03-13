@@ -47,6 +47,12 @@ export default class SyncRoles extends BaseCommand {
           PermissionCode.ATTENDANCE_CHECKIN,
         ],
       },
+      {
+        code: RoleCode.COACH,
+        name: 'Entrenador',
+        description: 'Gestión de entrenamientos y asistencia de socios',
+        permissions: [PermissionCode.CLIENTS_READ, PermissionCode.CLIENTS_WRITE],
+      },
     ]
 
     for (const config of rolesConfig) {

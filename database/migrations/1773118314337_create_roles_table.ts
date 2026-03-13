@@ -16,7 +16,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at')
 
       table.check(
-        `name in ('${RoleCode.SUPERADMIN}', '${RoleCode.ADMIN}', '${RoleCode.RECEPTIONIST}', '${RoleCode.COACH}')`
+        `code in ('${RoleCode.SUPERADMIN}', '${RoleCode.ADMIN}', '${RoleCode.RECEPTIONIST}', '${RoleCode.COACH}')`
       )
     })
   }

@@ -23,6 +23,12 @@ export default class SyncPermissions extends BaseCommand {
         description: 'Administrar personal y accesos',
       },
       {
+        code: PermissionCode.ROLES_MANAGE,
+        name: 'Gestionar Roles',
+        module: PermissionModule.AUTH,
+        description: 'Asignar y modificar roles de usuarios',
+      },
+      {
         code: PermissionCode.CLIENTS_READ,
         name: 'Ver Socios',
         module: PermissionModule.CLIENTS,
@@ -33,6 +39,18 @@ export default class SyncPermissions extends BaseCommand {
         name: 'Editar Socios',
         module: PermissionModule.CLIENTS,
         description: 'Crear y modificar perfiles de socios',
+      },
+      {
+        code: PermissionCode.CLIENTS_DELETE,
+        name: 'Eliminar Socios',
+        module: PermissionModule.CLIENTS,
+        description: 'Dar de baja o eliminar socios',
+      },
+      {
+        code: PermissionCode.PAYMENTS_READ,
+        name: 'Ver Cobros',
+        module: PermissionModule.FINANCE,
+        description: 'Consultar historial de pagos',
       },
       {
         code: PermissionCode.PAYMENTS_WRITE,
@@ -53,10 +71,46 @@ export default class SyncPermissions extends BaseCommand {
         description: 'Registro de entrada/salida en sucursal',
       },
       {
+        code: PermissionCode.BRANCH_MANAGE,
+        name: 'Gestionar Sucursales',
+        module: PermissionModule.OPERATIONS,
+        description: 'Crear y configurar sucursales',
+      },
+      {
+        code: PermissionCode.CLASSES_MANAGE,
+        name: 'Gestionar Clases',
+        module: PermissionModule.FITNESS,
+        description: 'Crear horarios y clases grupales',
+      },
+      {
+        code: PermissionCode.TRAINERS_MANAGE,
+        name: 'Gestionar Entrenadores',
+        module: PermissionModule.FITNESS,
+        description: 'Alta y asignación de entrenadores',
+      },
+      {
+        code: PermissionCode.ROUTINES_MANAGE,
+        name: 'Gestionar Rutinas',
+        module: PermissionModule.WORKOUT,
+        description: 'Crear y asignar rutinas de entrenamiento',
+      },
+      {
+        code: PermissionCode.CATALOG_MANAGE,
+        name: 'Gestionar Catálogo',
+        module: PermissionModule.WORKOUT,
+        description: 'Catálogo de ejercicios y materiales',
+      },
+      {
         code: PermissionCode.SETTINGS_MANAGE,
         name: 'Ajustes del Sistema',
         module: PermissionModule.SYSTEM,
         description: 'Configuración global del tenant',
+      },
+      {
+        code: PermissionCode.AUDIT_VIEW,
+        name: 'Ver Auditoría',
+        module: PermissionModule.SYSTEM,
+        description: 'Consultar registros de auditoría',
       },
     ]
 
