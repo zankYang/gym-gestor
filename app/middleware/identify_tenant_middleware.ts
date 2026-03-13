@@ -14,16 +14,15 @@ export default class IdentifyTenantMiddleware {
 
     if (!hostname) {
       return ctx.response.badRequest({
-        message: 'No se pudo resolver el host de la petición',
+        errors: [{ message: 'No se pudo resolver el host de la petición' }],
       })
     }
-    console.log(hostname)
     const subdomain = hostname.split('.')[0]
     const tenant = await Tenant.query().where('slug', subdomain).first()
 
     if (!tenant) {
       return ctx.response.notFound({
-        message: 'Plataforma no válida',
+        errors: [{ message: 'Plataforma no válida' }],
       })
     }
 
