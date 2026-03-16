@@ -1047,7 +1047,7 @@ export class UserSchema extends BaseModel {
     'firstName',
     'lastName',
     'email',
-    'phone',
+    'pho|e',
     'passwordHash',
     'status',
     'lastLoginAt',

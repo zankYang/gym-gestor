@@ -44,4 +44,8 @@ export enum PermissionCode {
   REPORTS_VIEW = 'reports:view',
   DOCUMENTS_MANAGE = 'documents:manage',
   NOTIFICATIONS_MANAGE = 'notifications:manage',
+  // tenants
+  TENANTS_READ = 'tenants:read',
+  TENANTS_WRITE = 'tenants:write',
+  TENANTS_DELETE = 'tenants:delete',
 }

@@ -7,7 +7,8 @@ import { PermissionCode } from '#enums/permissions_enum'
 
 export default class SyncRoles extends BaseCommand {
   static commandName = 'sync:roles'
-  static description = 'Sincroniza los roles y asigna sus permisos base (requiere sync:permissions previo)'
+  static description =
+    'Sincroniza los roles y asigna sus permisos base (requiere sync:permissions previo)'
 
   static options: CommandOptions = { startApp: true }
 

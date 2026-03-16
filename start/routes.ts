@@ -10,6 +10,7 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+import { PermissionCode } from '#enums/permissions_enum'
 
 router.get('/', () => {
   return { server: 'running' }
@@ -20,14 +21,22 @@ router
     // Admin routes
     router
       .group(() => {
-        router.get('gyms', [controllers.admin.ListGyms, 'index'])
-        router.post('gyms', [controllers.admin.CreateGym, 'store'])
-        router.patch('gyms/:id', [controllers.admin.UpdateGym, 'update'])
-        router.delete('gyms/:id', [controllers.admin.DestroyGym, 'destroy'])
+        router
+          .get('tenants', [controllers.admin.ListTenants, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.TENANTS_READ])])
+        router
+          .post('tenants', [controllers.admin.CreateTenant, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.TENANTS_WRITE])])
+        router
+          .patch('tenants/:id', [controllers.admin.UpdateTenant, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.TENANTS_WRITE])])
+        router
+          .delete('tenants/:id', [controllers.admin.DestroyTenant, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.TENANTS_DELETE])])
       })
       .prefix('/admin')
       .as('admin')
-      .use([middleware.auth(), middleware.superadmin()])
+      .use([middleware.auth(), middleware.hasPermissions([PermissionCode.TENANTS_READ])])
 
     // User routes
     router
@@ -41,7 +50,7 @@ router
       })
       .prefix('/users')
       .as('users')
-      .use([middleware.auth(), middleware.canManageUsers()])
+      .use([middleware.auth()])
 
     // Auth routes
     router

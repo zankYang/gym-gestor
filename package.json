@@ -24,6 +24,7 @@
     "db:setup": "node ace migration:fresh && node ace sync:permissions && node ace sync:roles && node ace db:seed && node ace create:superadmin && pnpm review:fix && pnpm review:test"
   },
   "imports": {
+    "#commands/*": "./commands/*.js",
     "#controllers/*": "./app/controllers/*.js",
     "#exceptions/*": "./app/exceptions/*.js",
     "#models/*": "./app/models/*.js",
