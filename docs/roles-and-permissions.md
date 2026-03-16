@@ -30,11 +30,11 @@ pnpm db:setup
 
 ### Referencia de comandos
 
-| Comando                      | Flags                                                                         | Descripción                                                                        |
-| ---------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `node ace sync:permissions`  | —                                                                             | Crea o actualiza los 22 permisos del enum en la base de datos                     |
-| `node ace sync:roles`        | —                                                                             | Crea o actualiza los 4 roles y sincroniza sus permisos (requiere `sync:permissions` previo) |
-| `node ace create:superadmin` | `--email` / `-e` · `--firstName` / `-n` · `--lastName` / `-l` · `--password` / `-p` | Crea un usuario superadmin (crea su propio tenant automáticamente)          |
+| Comando                      | Flags                                                                               | Descripción                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `node ace sync:permissions`  | —                                                                                   | Crea o actualiza los 22 permisos del enum en la base de datos                               |
+| `node ace sync:roles`        | —                                                                                   | Crea o actualiza los 4 roles y sincroniza sus permisos (requiere `sync:permissions` previo) |
+| `node ace create:superadmin` | `--email` / `-e` · `--firstName` / `-n` · `--lastName` / `-l` · `--password` / `-p` | Crea un usuario superadmin (crea su propio tenant automáticamente)                          |
 
 ---
 
@@ -42,12 +42,12 @@ pnpm db:setup
 
 Los roles se definen en `app/enums/role_enum.ts` y se sincronizan con `node ace sync:roles`.
 
-| Código         | Nombre                    | Scope  | Permisos | Descripción                                             |
-| -------------- | ------------------------- | ------ | :------: | ------------------------------------------------------- |
-| `superadmin`   | Super Administrador       | Global |    22    | Control total del sistema. Accede a todos los tenants.  |
-| `admin`        | Administrador de Gimnasio | Tenant |    22    | Gestión total de su propio gimnasio.                    |
-| `receptionist` | Recepcionista             | Tenant |    8     | Gestión de socios, cobros y asistencia diaria.          |
-| `coach`        | Entrenador                | Tenant |    6     | Entrenamiento: socios, asistencia, rutinas y clases.    |
+| Código         | Nombre                    | Scope  | Permisos | Descripción                                            |
+| -------------- | ------------------------- | ------ | :------: | ------------------------------------------------------ |
+| `superadmin`   | Super Administrador       | Global |    22    | Control total del sistema. Accede a todos los tenants. |
+| `admin`        | Administrador de Gimnasio | Tenant |    22    | Gestión total de su propio gimnasio.                   |
+| `receptionist` | Recepcionista             | Tenant |    8     | Gestión de socios, cobros y asistencia diaria.         |
+| `coach`        | Entrenador                | Tenant |    6     | Entrenamiento: socios, asistencia, rutinas y clases.   |
 
 > **Scope Global:** `superadmin` tiene su propio tenant interno y puede actuar sobre cualquier gimnasio.  
 > **Scope Tenant:** el resto de roles solo pueden operar dentro del gimnasio al que pertenecen.
@@ -64,10 +64,10 @@ Total: **22 permisos** en **7 módulos**.
 
 ### auth — Usuarios y Roles
 
-| Código          | Nombre             | Descripción                           |
-| --------------- | ------------------ | ------------------------------------- |
-| `users:manage`  | Gestionar Usuarios | Administrar personal y accesos        |
-| `roles:manage`  | Gestionar Roles    | Asignar y modificar roles de usuarios |
+| Código         | Nombre             | Descripción                           |
+| -------------- | ------------------ | ------------------------------------- |
+| `users:manage` | Gestionar Usuarios | Administrar personal y accesos        |
+| `roles:manage` | Gestionar Roles    | Asignar y modificar roles de usuarios |
 
 ### clients — Socios y Membresías
 
@@ -89,18 +89,18 @@ Total: **22 permisos** en **7 módulos**.
 
 ### operations — Asistencia y Sucursales
 
-| Código               | Nombre               | Descripción                                  |
-| -------------------- | -------------------- | -------------------------------------------- |
-| `attendance:checkin` | Check-in Asistencia  | Registrar entrada/salida de socios           |
-| `attendances:view`   | Ver Asistencias      | Consultar historial de asistencias           |
-| `branch:manage`      | Gestionar Sucursales | Crear y configurar sucursales                |
+| Código               | Nombre               | Descripción                        |
+| -------------------- | -------------------- | ---------------------------------- |
+| `attendance:checkin` | Check-in Asistencia  | Registrar entrada/salida de socios |
+| `attendances:view`   | Ver Asistencias      | Consultar historial de asistencias |
+| `branch:manage`      | Gestionar Sucursales | Crear y configurar sucursales      |
 
 ### fitness — Clases y Entrenadores
 
-| Código            | Nombre                  | Descripción                       |
-| ----------------- | ----------------------- | --------------------------------- |
-| `classes:manage`  | Gestionar Clases        | Crear horarios y clases grupales  |
-| `trainers:manage` | Gestionar Entrenadores  | Alta y asignación de entrenadores |
+| Código            | Nombre                 | Descripción                       |
+| ----------------- | ---------------------- | --------------------------------- |
+| `classes:manage`  | Gestionar Clases       | Crear horarios y clases grupales  |
+| `trainers:manage` | Gestionar Entrenadores | Alta y asignación de entrenadores |
 
 ### workout — Rutinas y Catálogo
 
@@ -111,13 +111,13 @@ Total: **22 permisos** en **7 módulos**.
 
 ### system — Sistema
 
-| Código                  | Nombre                   | Descripción                                    |
-| ----------------------- | ------------------------ | ---------------------------------------------- |
-| `settings:manage`       | Ajustes del Sistema      | Configuración global del tenant                |
-| `audit:view`            | Ver Auditoría            | Consultar registros de auditoría               |
-| `reports:view`          | Ver Reportes             | Acceder a reportes y estadísticas del gimnasio |
-| `documents:manage`      | Gestionar Documentos     | Subir y gestionar documentos del tenant        |
-| `notifications:manage`  | Gestionar Notificaciones | Enviar y gestionar notificaciones a socios     |
+| Código                 | Nombre                   | Descripción                                    |
+| ---------------------- | ------------------------ | ---------------------------------------------- |
+| `settings:manage`      | Ajustes del Sistema      | Configuración global del tenant                |
+| `audit:view`           | Ver Auditoría            | Consultar registros de auditoría               |
+| `reports:view`         | Ver Reportes             | Acceder a reportes y estadísticas del gimnasio |
+| `documents:manage`     | Gestionar Documentos     | Subir y gestionar documentos del tenant        |
+| `notifications:manage` | Gestionar Notificaciones | Enviar y gestionar notificaciones a socios     |
 
 ---
 

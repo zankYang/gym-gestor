@@ -95,10 +95,10 @@ Comandos típicos de Lucid (base de datos):
 
 ## Comandos Ace (personalizados)
 
-| Comando                                                                                          | Descripción                                                  |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Comando                                                                                                              | Descripción                                                        |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | `node ace create:superadmin --email=tu@email.com --firstName="Nombre" --lastName="Apellido" --password=tucontraseña` | Crear superadmin con flags personalizados (`-e`, `-n`, `-l`, `-p`) |
-| `node ace sync:permissions`                                                                      | Sincroniza los permisos del enum con la base de datos        |
+| `node ace sync:permissions`                                                                                          | Sincroniza los permisos del enum con la base de datos              |
 
 ## Documentación útil
 
