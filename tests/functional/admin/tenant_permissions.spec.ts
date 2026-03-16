@@ -64,4 +64,21 @@ test.group('Admin / Tenant – autorización de permisos', (group) => {
       ],
     })
   })
+
+  test('listar tenants sin autenticación → 401', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const response = await client
+      .get('/api/admin/tenants')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+
+    response.assertStatus(401)
+    const body = response.body()! as ResponseError
+    assert.deepEqual(body, {
+      errors: [
+        {
+          message: 'Debes iniciar sesión para acceder a esta sección',
+        },
+      ],
+    })
+  })
 })
