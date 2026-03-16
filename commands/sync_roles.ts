@@ -1,4 +1,3 @@
-// commands/sync_roles.ts
 import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
 import Role from '#models/role'
@@ -8,12 +7,61 @@ import { PermissionCode } from '#enums/permissions_enum'
 
 export default class SyncRoles extends BaseCommand {
   static commandName = 'sync:roles'
-  static description = 'Sincroniza los roles y asigna sus permisos base'
+  static description =
+    'Sincroniza los roles y asigna sus permisos base (requiere sync:permissions previo)'
 
   static options: CommandOptions = { startApp: true }
 
   async run() {
     this.logger.info('Sincronizando roles y permisos...')
+
+    // Permisos exclusivos del admin dentro de su tenant (gestión completa)
+    const ADMIN_PERMISSIONS: PermissionCode[] = [
+      PermissionCode.USERS_MANAGE,
+      PermissionCode.ROLES_MANAGE,
+      PermissionCode.CLIENTS_READ,
+      PermissionCode.CLIENTS_WRITE,
+      PermissionCode.CLIENTS_DELETE,
+      PermissionCode.MEMBERSHIPS_MANAGE,
+      PermissionCode.PAYMENTS_READ,
+      PermissionCode.PAYMENTS_WRITE,
+      PermissionCode.PAYMENTS_CANCEL,
+      PermissionCode.PLANS_MANAGE,
+      PermissionCode.ATTENDANCE_CHECKIN,
+      PermissionCode.ATTENDANCES_VIEW,
+      PermissionCode.BRANCH_MANAGE,
+      PermissionCode.CLASSES_MANAGE,
+      PermissionCode.TRAINERS_MANAGE,
+      PermissionCode.ROUTINES_MANAGE,
+      PermissionCode.CATALOG_MANAGE,
+      PermissionCode.SETTINGS_MANAGE,
+      PermissionCode.AUDIT_VIEW,
+      PermissionCode.REPORTS_VIEW,
+      PermissionCode.DOCUMENTS_MANAGE,
+      PermissionCode.NOTIFICATIONS_MANAGE,
+    ]
+
+    // Operaciones del día a día: socios, cobros, membresías y asistencia
+    const RECEPTIONIST_PERMISSIONS: PermissionCode[] = [
+      PermissionCode.CLIENTS_READ,
+      PermissionCode.CLIENTS_WRITE,
+      PermissionCode.MEMBERSHIPS_MANAGE,
+      PermissionCode.PAYMENTS_READ,
+      PermissionCode.PAYMENTS_WRITE,
+      PermissionCode.PLANS_MANAGE,
+      PermissionCode.ATTENDANCE_CHECKIN,
+      PermissionCode.ATTENDANCES_VIEW,
+    ]
+
+    // Entrenamiento: socios, asistencia, rutinas y clases grupales
+    const COACH_PERMISSIONS: PermissionCode[] = [
+      PermissionCode.CLIENTS_READ,
+      PermissionCode.ATTENDANCE_CHECKIN,
+      PermissionCode.ATTENDANCES_VIEW,
+      PermissionCode.ROUTINES_MANAGE,
+      PermissionCode.CLASSES_MANAGE,
+      PermissionCode.CATALOG_MANAGE,
+    ]
 
     const rolesConfig = [
       {
@@ -25,33 +73,20 @@ export default class SyncRoles extends BaseCommand {
       {
         code: RoleCode.ADMIN,
         name: 'Administrador de Gimnasio',
-        description: 'Gestión total de su propio gimnasio (Tenant)',
-        permissions: [
-          PermissionCode.USERS_MANAGE,
-          PermissionCode.CLIENTS_READ,
-          PermissionCode.CLIENTS_WRITE,
-          PermissionCode.PAYMENTS_WRITE,
-          PermissionCode.PLANS_MANAGE,
-          PermissionCode.ATTENDANCE_CHECKIN,
-          PermissionCode.SETTINGS_MANAGE,
-        ],
+        description: 'Gestión total de su propio gimnasio (tenant)',
+        permissions: ADMIN_PERMISSIONS,
       },
       {
         code: RoleCode.RECEPTIONIST,
         name: 'Recepcionista',
         description: 'Gestión de socios, cobros y asistencia diaria',
-        permissions: [
-          PermissionCode.CLIENTS_READ,
-          PermissionCode.CLIENTS_WRITE,
-          PermissionCode.PAYMENTS_WRITE,
-          PermissionCode.ATTENDANCE_CHECKIN,
-        ],
+        permissions: RECEPTIONIST_PERMISSIONS,
       },
       {
         code: RoleCode.COACH,
         name: 'Entrenador',
         description: 'Gestión de entrenamientos y asistencia de socios',
-        permissions: [PermissionCode.CLIENTS_READ, PermissionCode.CLIENTS_WRITE],
+        permissions: COACH_PERMISSIONS,
       },
     ]
 
@@ -69,7 +104,7 @@ export default class SyncRoles extends BaseCommand {
 
       if (permissionIds.length !== config.permissions.length) {
         this.logger.warning(
-          `Atención: Para el rol [${config.code}], se esperaban ${config.permissions.length} permisos pero solo se encontraron ${permissionIds.length} en la DB. ¡Corre sync:permissions primero!`
+          `Rol [${config.code}]: se esperaban ${config.permissions.length} permisos pero solo se encontraron ${permissionIds.length} en la DB. Ejecuta node ace sync:permissions primero.`
         )
       }
 
@@ -77,5 +112,7 @@ export default class SyncRoles extends BaseCommand {
 
       this.logger.success(`Rol [${config.code}] sincronizado con ${permissionIds.length} permisos.`)
     }
+
+    this.logger.info('Sincronización de roles completada.')
   }
 }

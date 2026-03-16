@@ -1,14 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { updateGymValidator } from '#validators/gym'
+import { updateTenantValidator } from '#validators/tenant'
 import Tenant from '#models/tenant'
 
-export default class UpdateGymController {
-  /**
-   * Actualiza un gym por id. Solo superadmin puede gestionar cualquier gym.
-   */
+export default class UpdateTenantController {
   async update({ params, request, response }: HttpContext) {
     const tenant = await Tenant.notDeleted().where('id', params.id).firstOrFail()
-    const payload = await request.validateUsing(updateGymValidator)
+    const payload = await request.validateUsing(updateTenantValidator)
 
     if (payload.slug !== undefined && payload.slug !== tenant.slug) {
       const existing = await Tenant.notDeleted()
@@ -17,7 +14,7 @@ export default class UpdateGymController {
         .first()
       if (existing) {
         return response.badRequest({
-          message: 'Ya existe otro gym con ese slug',
+          errors: [{ message: 'Ya existe otro tenant con ese slug' }],
         })
       }
     }
@@ -26,7 +23,7 @@ export default class UpdateGymController {
     await tenant.save()
 
     return response.ok({
-      message: 'Gym actualizado correctamente',
+      message: 'Tenant actualizado correctamente',
       data: tenant,
     })
   }

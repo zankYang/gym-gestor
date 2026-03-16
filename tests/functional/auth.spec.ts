@@ -21,7 +21,7 @@ type ResponseError = {
 test.group('Auth', (group) => {
   group.each.setup(() => testUtils.db().truncate())
 
-  test('login con credenciales correctas', async ({ assert, client }) => {
+  test('login con credenciales correctas -> 200', async ({ assert, client }) => {
     const role = await Role.create({
       name: RoleCode.ADMIN,
       code: RoleCode.ADMIN,
@@ -48,7 +48,7 @@ test.group('Auth', (group) => {
     })
   })
 
-  test('login con credenciales incorrectas', async ({ assert, client }) => {
+  test('login con credenciales incorrectas -> 401', async ({ assert, client }) => {
     const role = await Role.create({
       name: RoleCode.ADMIN,
       code: RoleCode.ADMIN,
@@ -79,7 +79,7 @@ test.group('Auth', (group) => {
     })
   })
 
-  test('login en tenant diferente al del usuario', async ({ assert, client }) => {
+  test('login en tenant diferente al del usuario -> 401', async ({ assert, client }) => {
     const role = await Role.create({
       name: RoleCode.ADMIN,
       code: RoleCode.ADMIN,

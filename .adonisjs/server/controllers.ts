@@ -5,10 +5,10 @@
 
 export const controllers = {
   admin: {
-    CreateGym: () => import('#controllers/admin/create_gym_controller'),
-    DestroyGym: () => import('#controllers/admin/destroy_gym_controller'),
-    ListGyms: () => import('#controllers/admin/list_gyms_controller'),
-    UpdateGym: () => import('#controllers/admin/update_gym_controller'),
+    CreateTenant: () => import('#controllers/admin/create_tenant_controller'),
+    DestroyTenant: () => import('#controllers/admin/destroy_tenant_controller'),
+    ListTenants: () => import('#controllers/admin/list_tenants_controller'),
+    UpdateTenant: () => import('#controllers/admin/update_tenant_controller'),
   },
   auth: {
     AccessToken: () => import('#controllers/auth/access_token_controller'),

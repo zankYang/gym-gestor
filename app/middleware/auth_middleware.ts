@@ -14,7 +14,13 @@ export default class AuthMiddleware {
       guards?: (keyof Authenticators)[]
     } = {}
   ) {
-    await ctx.auth.authenticateUsing(options.guards)
-    return next()
+    try {
+      await ctx.auth.authenticateUsing(options.guards)
+      return next()
+    } catch {
+      return ctx.response.unauthorized({
+        errors: [{ message: 'Debes iniciar sesión para acceder a esta sección' }],
+      })
+    }
   }
 }

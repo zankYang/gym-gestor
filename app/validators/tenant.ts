@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const createGymValidator = vine.create({
+export const createTenantValidator = vine.create({
   name: vine.string(),
   slug: vine.string().unique({ table: 'tenants', column: 'slug' }),
   logoUrl: vine.string().nullable().optional(),
@@ -14,7 +14,7 @@ export const createGymValidator = vine.create({
   status: vine.enum(['active', 'inactive', 'suspended']),
 })
 
-export const updateGymValidator = vine.create({
+export const updateTenantValidator = vine.create({
   name: vine.string().optional(),
   slug: vine.string().optional(),
   logoUrl: vine.string().nullable().optional(),

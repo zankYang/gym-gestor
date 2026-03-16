@@ -1,10 +1,10 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import User from '#models/user'
 import Role from '#models/role'
-import hash from '@adonisjs/core/services/hash'
 import { CommandOptions } from '@adonisjs/core/types/ace'
 import { Status } from '#enums/status_enum'
 import { RoleCode } from '#enums/role_enum'
+import Tenant from '#models/tenant'
 
 export default class CreateSuperadmin extends BaseCommand {
   static commandName = 'create:superadmin'
@@ -33,12 +33,6 @@ export default class CreateSuperadmin extends BaseCommand {
   })
   declare password: string
 
-  @flags.number({
-    description: 'ID del tenant al que pertenece el superadmin',
-    alias: 't',
-  })
-  declare tenantId: number
-
   async run() {
     if (!this.email?.trim()) {
       this.logger.error('El flag --email es obligatorio.')
@@ -51,7 +45,15 @@ export default class CreateSuperadmin extends BaseCommand {
       return
     }
 
-    const existing = await User.query().where('email', this.email).first()
+    const tenant = await Tenant.create({
+      name: 'Superadmin',
+      slug: 'superadmin',
+    })
+
+    const existing = await User.query()
+      .where('email', this.email.trim())
+      .where('tenant_id', tenant.id)
+      .first()
     if (existing) {
       this.logger.error(`Ya existe un usuario con el email "${this.email}".`)
       this.exitCode = 1
@@ -67,14 +69,13 @@ export default class CreateSuperadmin extends BaseCommand {
       return
     }
 
-    const passwordHash = await hash.make(this.password)
-
     const user = await User.create({
-      tenantId: this.tenantId,
+      tenantId: tenant.id,
+      branchId: null,
       firstName: this.firstName.trim(),
       lastName: this.lastName.trim(),
       email: this.email.trim(),
-      passwordHash,
+      passwordHash: this.password,
       roleId: superadminRole.id,
       status: Status.ACTIVE,
     })
