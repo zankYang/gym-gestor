@@ -5,13 +5,9 @@ import { TenantFactory } from '#database/factories/tenant_factory'
 import ace from '@adonisjs/core/services/ace'
 import SyncRoles from '#commands/sync_roles'
 import SyncPermissions from '#commands/sync_permissions'
-
-type Response = {
-  message: string
-  data: {
-    [key: string]: unknown
-  }
-}
+import Role from '#models/role'
+import { RoleCode } from '#enums/role_enum'
+import Tenant from '#models/tenant'
 
 type ResponseError = {
   errors: { message: string }[]
@@ -31,7 +27,13 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
   test('actualizar tenant con autenticación y permisos → 200', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 1 }).create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const user = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
@@ -39,17 +41,30 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
       .loginAs(user)
 
     response.assertStatus(200)
-    const body = response.body()! as Response
-    assert.deepEqual(body, {
-      message: 'Tenant actualizado correctamente',
-      data: response.body()!.data,
-    })
+
+    const body = response.body()
+
+    console.log(body)
+
+    assert.equal(body.message, 'Tenant actualizado correctamente')
+    assert.equal(body.data.name, 'Nombre Actualizado')
+    assert.equal(body.data.id, tenant.id)
+    assert.equal(body.data.slug, tenant.slug)
+
+    const tenantDB = await Tenant.find(tenant.id)
+    assert.equal(tenantDB!.name, 'Nombre Actualizado')
   })
 
   test('actualizar tenant con slug duplicado → 400', async ({ client, assert }) => {
     const tenantA = await TenantFactory.merge({ slug: 'slug-existente' }).create()
     const tenantB = await TenantFactory.create()
-    const user = await UserFactory.merge({ tenantId: tenantB.id, roleId: 1 }).create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const user = await UserFactory.merge({
+      tenantId: tenantB.id,
+      roleId: superadminRole.id,
+    }).create()
+
     const response = await client
       .patch(`/api/admin/tenants/${tenantB.id}`)
       .header('Host', `${tenantB.slug}.localhost:3333`)
@@ -57,15 +72,24 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
       .loginAs(user)
 
     response.assertStatus(400)
-    const body = response.body()! as ResponseError
+
+    const body = response.body() as ResponseError
     assert.deepEqual(body, {
       errors: [{ message: 'Ya existe otro tenant con ese slug' }],
     })
-  })
 
+    const tenantBFromDb = await Tenant.findOrFail(tenantB.id)
+    assert.equal(tenantBFromDb.slug, tenantB.slug)
+  })
   test('actualizar tenant inexistente → 404', async ({ client }) => {
     const tenant = await TenantFactory.create()
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 1 }).create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const user = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
     const response = await client
       .patch('/api/admin/tenants/999999')
       .header('Host', `${tenant.slug}.localhost:3333`)
@@ -75,9 +99,15 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
     response.assertStatus(404)
   })
 
-  test('actualizar tenant sin permiso TENANTS_WRITE → 403', async ({ client, assert }) => {
+  test('actualizar tenant sin permiso para editar tenants → 403', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 2 }).create()
+    const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
+
+    const user = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: receptionistRole.id,
+    }).create()
+
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
@@ -85,7 +115,8 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
       .loginAs(user)
 
     response.assertStatus(403)
-    const body = response.body()! as ResponseError
+
+    const body = response.body() as ResponseError
     assert.deepEqual(body, {
       errors: [
         {
@@ -93,17 +124,22 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
         },
       ],
     })
+
+    const tenantDB = await Tenant.find(tenant.id)
+    assert.equal(tenantDB!.name, tenant.name)
   })
 
   test('actualizar tenant sin autenticación → 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
+
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json({ name: 'Sin Auth' })
 
     response.assertStatus(401)
-    const body = response.body()! as ResponseError
+
+    const body = response.body() as ResponseError
     assert.deepEqual(body, {
       errors: [
         {
@@ -111,5 +147,8 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
         },
       ],
     })
+
+    const tenantDB = await Tenant.find(tenant.id)
+    assert.equal(tenantDB!.name, tenant.name)
   })
 })

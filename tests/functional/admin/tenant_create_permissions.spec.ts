@@ -72,7 +72,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
     assert.equal(tenantDB.status, payload.status)
   })
 
-  test('crear tenant con campos opcionales nulos → 201', async ({ client, assert }) => {
+  test('crear tenant con campos opcionales nulos -> 201', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -135,7 +135,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
     assert.equal(tenantDB.address, null)
   })
 
-  test('crear tenant sin campos requeridos → 422', async ({ client, assert }) => {
+  test('crear tenant sin campos requeridos -> 422', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -173,7 +173,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
     ])
   })
 
-  test('crear tenant sin permiso para crear tenants → 403', async ({ client, assert }) => {
+  test('crear tenant sin permiso para crear tenants -> 403', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
 
@@ -207,7 +207,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
     assert.isNull(blockedTenant)
   })
 
-  test('crear tenant sin autenticación → 401', async ({ client, assert }) => {
+  test('crear tenant sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
 
     const response = await client

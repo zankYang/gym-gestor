@@ -30,7 +30,7 @@ test.group('Admin / Tenant – autorización de permisos', (group) => {
     syncRoles.assertSucceeded()
   })
 
-  test('listar tenants con autenticación → 200', async ({ client, assert }) => {
+  test('listar tenants con autenticación -> 200', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 1 }).create()
     const response = await client
@@ -45,7 +45,7 @@ test.group('Admin / Tenant – autorización de permisos', (group) => {
     })
   })
 
-  test('listar tenants sin permiso TENANTS_READ → 403', async ({ client, assert }) => {
+  test('listar tenants sin permiso TENANTS_READ -> 403', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 2 }).create()
     const response = await client
@@ -65,7 +65,7 @@ test.group('Admin / Tenant – autorización de permisos', (group) => {
     })
   })
 
-  test('listar tenants sin autenticación → 401', async ({ client, assert }) => {
+  test('listar tenants sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const response = await client
       .get('/api/admin/tenants')

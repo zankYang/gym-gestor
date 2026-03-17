@@ -25,7 +25,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
     syncRoles.assertSucceeded()
   })
 
-  test('eliminar tenant con autenticación y permisos → 200', async ({ client, assert }) => {
+  test('eliminar tenant con autenticación y permisos -> 200', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -50,7 +50,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
     assert.isNotNull(tenantDB.deletedAt)
   })
 
-  test('eliminar tenant inexistente → 404', async ({ client, assert }) => {
+  test('eliminar tenant inexistente -> 404', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -75,16 +75,23 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
     })
   })
 
-  test('eliminar tenant sin permiso TENANTS_DELETE → 403', async ({ client, assert }) => {
+  test('eliminar tenant sin permiso para dar de baja -> 403', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: 2 }).create()
+    const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
+
+    const user = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: receptionistRole.id,
+    }).create()
+
     const response = await client
       .delete(`/api/admin/tenants/${tenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .loginAs(user)
 
     response.assertStatus(403)
-    const body = response.body()! as ResponseError
+
+    const body = response.body() as ResponseError
     assert.deepEqual(body, {
       errors: [
         {
@@ -92,16 +99,21 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
         },
       ],
     })
+
+    const tenantDB = await Tenant.find(tenant.id)
+    assert.isNull(tenantDB!.deletedAt)
   })
 
-  test('eliminar tenant sin autenticación → 401', async ({ client, assert }) => {
+  test('eliminar tenant sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
+
     const response = await client
       .delete(`/api/admin/tenants/${tenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
-    const body = response.body()! as ResponseError
+
+    const body = response.body() as ResponseError
     assert.deepEqual(body, {
       errors: [
         {
@@ -109,5 +121,8 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
         },
       ],
     })
+
+    const tenantDB = await Tenant.find(tenant.id)
+    assert.isNull(tenantDB!.deletedAt)
   })
 })
