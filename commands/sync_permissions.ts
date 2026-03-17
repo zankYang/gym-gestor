@@ -17,6 +17,27 @@ export default class SyncPermissions extends BaseCommand {
     const permissions = [
       // --- auth ---
       {
+        code: PermissionCode.USERS_READ,
+        name: 'Ver Usuarios',
+        module: PermissionModule.AUTH,
+        description:
+          'Permite consultar el listado de usuarios del tenant y ver el detalle de cada cuenta (rol, estado, datos de acceso).',
+      },
+      {
+        code: PermissionCode.USERS_WRITE,
+        name: 'Editar Usuarios',
+        module: PermissionModule.AUTH,
+        description:
+          'Permite crear y modificar cuentas de personal: datos personales, email y restablecer contraseñas. No incluye asignar roles.',
+      },
+      {
+        code: PermissionCode.USERS_DELETE,
+        name: 'Eliminar Usuarios',
+        module: PermissionModule.AUTH,
+        description:
+          'Permite dar de baja o eliminar cuentas de usuarios del tenant. No aplica a superadmins ni a admins desde un rol inferior.',
+      },
+      {
         code: PermissionCode.USERS_MANAGE,
         name: 'Gestionar Usuarios',
         module: PermissionModule.AUTH,

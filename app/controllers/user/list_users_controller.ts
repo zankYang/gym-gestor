@@ -1,12 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
-import { RoleCode } from '#enums/role_enum'
-
 export default class ListUsersController {
   async index({ auth, response, request }: HttpContext) {
     const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
-    const currentRole = (currentUser.role as any).code as string
 
     const page = Math.max(1, Number(request.input('page', 1)))
     const perPage = Math.min(100, Math.max(1, Number(request.input('perPage', 10))))
@@ -16,13 +12,9 @@ export default class ListUsersController {
     const sortBy = (request.input('sortBy') ?? 'created_at').toString()
     let tenantIdFilter: number | undefined
 
-    if (currentRole === RoleCode.SUPERADMIN) {
-      tenantIdFilter = request.input('tenantId') as number
-    }
-
     const sortDir = (request.input('sortDir') ?? 'desc') as 'asc' | 'desc'
 
-    const query = User.notDeleted()
+    const query = User.notDeleted().where('tenant_id', currentUser.tenantId)
 
     if (currentUser.tenantId) {
       query.where('tenant_id', currentUser.tenantId)

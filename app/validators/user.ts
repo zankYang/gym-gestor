@@ -8,33 +8,20 @@ const email = () => vine.string().email().maxLength(150)
 const password = () => vine.string().minLength(8).maxLength(20)
 const roleEnum = () => vine.string().in([RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH])
 const statusEnum = () => vine.string().in([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED])
-const id = () => vine.number().exists({ table: 'users', column: 'id' })
-
+const avatarUrl = () => vine.string().url().maxLength(255)
+const tenantId = () => vine.number().exists({ table: 'tenants', column: 'id' })
 /**
  * Validator para crear un usuario (admin/superadmin).
  * El email se valida como único por tenant en el controlador.
  */
 export const createUserValidator = vine.create({
-  tenantId: vine.number().exists({ table: 'tenants', column: 'id' }),
+  tenantId: tenantId().optional(),
+  avatarUrl: avatarUrl().optional(),
   firstName: firstName(),
   lastName: lastName(),
   email: email(),
   password: password(),
   role: roleEnum(),
-})
-
-/**
- * Validator para mostrar un usuario.
- */
-export const showUserValidator = vine.create({
-  id: id(),
-})
-
-/**
- * Validator para dar de baja un usuario.
- */
-export const destroyUserValidator = vine.create({
-  id: id(),
 })
 
 /**
@@ -52,6 +39,7 @@ export const loginValidator = vine.create({
 export const updateUserValidator = vine.create({
   firstName: firstName().optional(),
   lastName: lastName().optional(),
+  avatarUrl: avatarUrl().optional(),
   email: email().optional(),
   password: password().optional(),
   role: roleEnum().optional(),

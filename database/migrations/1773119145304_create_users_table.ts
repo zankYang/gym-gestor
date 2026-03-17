@@ -34,6 +34,7 @@ export default class extends BaseSchema {
 
       table.string('first_name', 100).notNullable()
       table.string('last_name', 100).notNullable()
+      table.string('avatar_url', 255).nullable()
       table.string('email', 150).notNullable()
       table.string('phone', 30).nullable()
       table.text('password_hash').notNullable()

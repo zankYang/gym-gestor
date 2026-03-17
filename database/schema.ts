@@ -1046,8 +1046,9 @@ export class UserSchema extends BaseModel {
     'branchId',
     'firstName',
     'lastName',
+    'avatarUrl',
     'email',
-    'pho|e',
+    'phone',
     'passwordHash',
     'status',
     'lastLoginAt',
@@ -1068,6 +1069,8 @@ export class UserSchema extends BaseModel {
   declare firstName: string
   @column()
   declare lastName: string
+  @column()
+  declare avatarUrl: string | null
   @column()
   declare email: string
   @column()
