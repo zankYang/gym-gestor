@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { Status } from '#enums/status_enum'
 
 export const createTenantValidator = vine.create({
   name: vine.string(),
@@ -11,7 +12,7 @@ export const createTenantValidator = vine.create({
   email: vine.string().nullable().optional(),
   phone: vine.string().nullable().optional(),
   address: vine.string().nullable().optional(),
-  status: vine.enum(['active', 'inactive', 'suspended']),
+  status: vine.enum([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]),
 })
 
 export const updateTenantValidator = vine.create({
@@ -25,5 +26,5 @@ export const updateTenantValidator = vine.create({
   email: vine.string().nullable().optional(),
   phone: vine.string().nullable().optional(),
   address: vine.string().nullable().optional(),
-  status: vine.enum(['active', 'inactive', 'suspended']).optional(),
+  status: vine.enum([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]).optional(),
 })

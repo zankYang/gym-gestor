@@ -7,7 +7,12 @@ export default class DestroyTenantController {
    * El registro permanece en BD con deleted_at; deja de aparecer en listados.
    */
   async destroy({ params, response }: HttpContext) {
-    const tenant = await Tenant.notDeleted().where('id', params.id).firstOrFail()
+    const tenant = await Tenant.notDeleted().where('id', params.id).first()
+    if (!tenant) {
+      return response.status(404).send({
+        errors: [{ message: 'Tenant no encontrado' }],
+      })
+    }
     await tenant.softDelete()
     return response.status(200).send({
       message: 'Tenant dado de baja correctamente',
