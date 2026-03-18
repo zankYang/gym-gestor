@@ -7,14 +7,11 @@ export default class ListUsersController {
     const currentUser = auth.getUserOrFail()
     await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
-    const requestedTenantId = request.input('tenantId')
-    const tenantIdFilter =
-      requestedTenantId !== undefined && !Number.isNaN(Number(requestedTenantId))
-        ? Number(requestedTenantId)
-        : undefined
+
+    const requestedTenantId = request.input('tenantId') ? Number(request.input('tenantId')) : undefined
 
     const targetTenantId =
-      currentRole === RoleCode.SUPERADMIN ? tenantIdFilter : currentUser.tenantId
+      currentRole === RoleCode.SUPERADMIN ? requestedTenantId : currentUser.tenantId
 
     const page = Math.max(1, Number(request.input('page', 1)))
     const perPage = Math.min(100, Math.max(1, Number(request.input('perPage', 10))))
