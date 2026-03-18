@@ -8,7 +8,22 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AttendanceSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'clientId', 'clientMembershipId', 'branchId', 'attendanceDate', 'checkInAt', 'checkOutAt', 'status', 'registeredBy', 'notes', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'clientId',
+    'clientMembershipId',
+    'branchId',
+    'attendanceDate',
+    'checkInAt',
+    'checkOutAt',
+    'status',
+    'registeredBy',
+    'notes',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = AttendanceSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -41,7 +56,19 @@ export class AttendanceSchema extends BaseModel {
 }
 
 export class AuditLogSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'userId', 'entityType', 'entityId', 'action', 'oldValues', 'newValues', 'ipAddress', 'userAgent', 'createdAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'userId',
+    'entityType',
+    'entityId',
+    'action',
+    'oldValues',
+    'newValues',
+    'ipAddress',
+    'userAgent',
+    'createdAt',
+  ] as const
   $columns = AuditLogSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -68,7 +95,18 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['id', 'tokenableId', 'type', 'name', 'hash', 'abilities', 'createdAt', 'updatedAt', 'lastUsedAt', 'expiresAt'] as const
+  static $columns = [
+    'id',
+    'tokenableId',
+    'type',
+    'name',
+    'hash',
+    'abilities',
+    'createdAt',
+    'updatedAt',
+    'lastUsedAt',
+    'expiresAt',
+  ] as const
   $columns = AuthAccessTokenSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -93,7 +131,19 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class BranchSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'name', 'code', 'phone', 'email', 'address', 'status', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'name',
+    'code',
+    'phone',
+    'email',
+    'address',
+    'status',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = BranchSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -120,7 +170,17 @@ export class BranchSchema extends BaseModel {
 }
 
 export class ClassReservationSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'classScheduleId', 'clientId', 'reservationDate', 'status', 'notes', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'classScheduleId',
+    'clientId',
+    'reservationDate',
+    'status',
+    'notes',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = ClassReservationSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -143,7 +203,18 @@ export class ClassReservationSchema extends BaseModel {
 }
 
 export class ClassScheduleSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'classId', 'dayOfWeek', 'startTime', 'endTime', 'roomName', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'classId',
+    'dayOfWeek',
+    'startTime',
+    'endTime',
+    'roomName',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = ClassScheduleSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -168,7 +239,19 @@ export class ClassScheduleSchema extends BaseModel {
 }
 
 export class ClassSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'branchId', 'trainerId', 'name', 'description', 'capacity', 'durationMinutes', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'branchId',
+    'trainerId',
+    'name',
+    'description',
+    'capacity',
+    'durationMinutes',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = ClassSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -195,7 +278,27 @@ export class ClassSchema extends BaseModel {
 }
 
 export class ClientMembershipSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'clientId', 'membershipPlanId', 'branchId', 'startDate', 'endDate', 'status', 'priceAtPurchase', 'discountAmount', 'finalAmount', 'autoRenew', 'frozenDaysUsed', 'notes', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'clientId',
+    'membershipPlanId',
+    'branchId',
+    'startDate',
+    'endDate',
+    'status',
+    'priceAtPurchase',
+    'discountAmount',
+    'finalAmount',
+    'autoRenew',
+    'frozenDaysUsed',
+    'notes',
+    'createdBy',
+    'updatedBy',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = ClientMembershipSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -238,7 +341,28 @@ export class ClientMembershipSchema extends BaseModel {
 }
 
 export class ClientSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'branchId', 'firstName', 'lastName', 'email', 'phone', 'birthDate', 'gender', 'emergencyContactName', 'emergencyContactPhone', 'medicalNotes', 'notes', 'status', 'joinedAt', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'branchId',
+    'firstName',
+    'lastName',
+    'email',
+    'phone',
+    'birthDate',
+    'gender',
+    'emergencyContactName',
+    'emergencyContactPhone',
+    'medicalNotes',
+    'notes',
+    'status',
+    'joinedAt',
+    'createdBy',
+    'updatedBy',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = ClientSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -283,7 +407,19 @@ export class ClientSchema extends BaseModel {
 }
 
 export class DocumentTypeSchema extends BaseModel {
-  static $columns = ['id', 'name', 'code', 'description', 'requiresSignature', 'requiresExpiration', 'isMandatoryForClient', 'isMandatoryForTrainer', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'name',
+    'code',
+    'description',
+    'requiresSignature',
+    'requiresExpiration',
+    'isMandatoryForClient',
+    'isMandatoryForTrainer',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = DocumentTypeSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -310,7 +446,29 @@ export class DocumentTypeSchema extends BaseModel {
 }
 
 export class DocumentSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'documentTypeId', 'fileId', 'entityType', 'entityId', 'title', 'description', 'status', 'version', 'issuedAt', 'expiresAt', 'isSigned', 'signedAt', 'uploadedBy', 'approvedBy', 'approvedAt', 'notes', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'documentTypeId',
+    'fileId',
+    'entityType',
+    'entityId',
+    'title',
+    'description',
+    'status',
+    'version',
+    'issuedAt',
+    'expiresAt',
+    'isSigned',
+    'signedAt',
+    'uploadedBy',
+    'approvedBy',
+    'approvedAt',
+    'notes',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = DocumentSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -357,7 +515,17 @@ export class DocumentSchema extends BaseModel {
 }
 
 export class ExerciseCatalogSchema extends BaseModel {
-  static $columns = ['id', 'name', 'code', 'muscleGroup', 'equipment', 'description', 'status', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'name',
+    'code',
+    'muscleGroup',
+    'equipment',
+    'description',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = ExerciseCatalogSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -380,7 +548,23 @@ export class ExerciseCatalogSchema extends BaseModel {
 }
 
 export class FileSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'storageProvider', 'bucketName', 'objectKey', 'originalName', 'storedName', 'mimeType', 'extension', 'sizeBytes', 'checksum', 'visibility', 'uploadedBy', 'createdAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'storageProvider',
+    'bucketName',
+    'objectKey',
+    'originalName',
+    'storedName',
+    'mimeType',
+    'extension',
+    'sizeBytes',
+    'checksum',
+    'visibility',
+    'uploadedBy',
+    'createdAt',
+    'deletedAt',
+  ] as const
   $columns = FileSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -415,7 +599,22 @@ export class FileSchema extends BaseModel {
 }
 
 export class MembershipPlanSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'name', 'code', 'description', 'durationDays', 'price', 'allowsClasses', 'allowsFreeze', 'freezeDaysLimit', 'status', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'name',
+    'code',
+    'description',
+    'durationDays',
+    'price',
+    'allowsClasses',
+    'allowsFreeze',
+    'freezeDaysLimit',
+    'status',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = MembershipPlanSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -448,7 +647,20 @@ export class MembershipPlanSchema extends BaseModel {
 }
 
 export class NotificationSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'recipientType', 'recipientId', 'title', 'message', 'channel', 'status', 'sentAt', 'readAt', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'recipientType',
+    'recipientId',
+    'title',
+    'message',
+    'channel',
+    'status',
+    'sentAt',
+    'readAt',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = NotificationSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -494,7 +706,24 @@ export class PaymentMethodSchema extends BaseModel {
 }
 
 export class PaymentSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'clientId', 'clientMembershipId', 'paymentMethodId', 'branchId', 'amount', 'paymentDate', 'reference', 'concept', 'status', 'notes', 'registeredBy', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'clientId',
+    'clientMembershipId',
+    'paymentMethodId',
+    'branchId',
+    'amount',
+    'paymentDate',
+    'reference',
+    'concept',
+    'status',
+    'notes',
+    'registeredBy',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = PaymentSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -531,7 +760,15 @@ export class PaymentSchema extends BaseModel {
 }
 
 export class PermissionSchema extends BaseModel {
-  static $columns = ['id', 'name', 'code', 'description', 'module', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'name',
+    'code',
+    'description',
+    'module',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = PermissionSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -580,7 +817,20 @@ export class RoleSchema extends BaseModel {
 }
 
 export class RoutineExerciseSchema extends BaseModel {
-  static $columns = ['id', 'routineId', 'exerciseCatalogId', 'dayLabel', 'exerciseOrder', 'setsCount', 'reps', 'restSeconds', 'weightNotes', 'observations', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'routineId',
+    'exerciseCatalogId',
+    'dayLabel',
+    'exerciseOrder',
+    'setsCount',
+    'reps',
+    'restSeconds',
+    'weightNotes',
+    'observations',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = RoutineExerciseSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -609,7 +859,23 @@ export class RoutineExerciseSchema extends BaseModel {
 }
 
 export class RoutineSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'clientId', 'trainerId', 'name', 'goal', 'status', 'startDate', 'endDate', 'notes', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'clientId',
+    'trainerId',
+    'name',
+    'goal',
+    'status',
+    'startDate',
+    'endDate',
+    'notes',
+    'createdBy',
+    'updatedBy',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = RoutineSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -644,7 +910,15 @@ export class RoutineSchema extends BaseModel {
 }
 
 export class SettingSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'key', 'value', 'description', 'createdAt', 'updatedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'key',
+    'value',
+    'description',
+    'createdAt',
+    'updatedAt',
+  ] as const
   $columns = SettingSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -663,7 +937,24 @@ export class SettingSchema extends BaseModel {
 }
 
 export class TenantSchema extends BaseModel {
-  static $columns = ['id', 'name', 'slug', 'logoUrl', 'banner', 'backgroundImageUrl', 'primaryColor', 'secondaryColor', 'email', 'phone', 'address', 'status', 'config', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'name',
+    'slug',
+    'logoUrl',
+    'banner',
+    'backgroundImageUrl',
+    'primaryColor',
+    'secondaryColor',
+    'email',
+    'phone',
+    'address',
+    'status',
+    'config',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = TenantSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -700,7 +991,22 @@ export class TenantSchema extends BaseModel {
 }
 
 export class TrainerSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'userId', 'branchId', 'firstName', 'lastName', 'email', 'phone', 'specialty', 'status', 'notes', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'userId',
+    'branchId',
+    'firstName',
+    'lastName',
+    'email',
+    'phone',
+    'specialty',
+    'status',
+    'notes',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = TrainerSchema.$columns
   @column({ isPrimary: true })
   declare id: number
@@ -733,7 +1039,23 @@ export class TrainerSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['id', 'tenantId', 'roleId', 'branchId', 'firstName', 'lastName', 'avatarUrl', 'email', 'phone', 'passwordHash', 'status', 'lastLoginAt', 'createdAt', 'updatedAt', 'deletedAt'] as const
+  static $columns = [
+    'id',
+    'tenantId',
+    'roleId',
+    'branchId',
+    'firstName',
+    'lastName',
+    'avatarUrl',
+    'email',
+    'phone',
+    'passwordHash',
+    'status',
+    'lastLoginAt',
+    'createdAt',
+    'updatedAt',
+    'deletedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column({ isPrimary: true })
   declare id: number
