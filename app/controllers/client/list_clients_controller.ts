@@ -1,0 +1,54 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import Client from '#models/client'
+import { RoleCode } from '#enums/role_enum'
+
+export default class ListClientsController {
+  async index({ auth, response, request }: HttpContext) {
+    const currentUser = auth.getUserOrFail()
+    await currentUser.load((preloader) => preloader.load('role'))
+    const currentRole = currentUser.role.code
+
+    const requestedTenantId = request.input('tenantId')
+    const tenantIdFilter =
+      requestedTenantId !== undefined && !Number.isNaN(Number(requestedTenantId))
+        ? Number(requestedTenantId)
+        : undefined
+
+    const targetTenantId =
+      currentRole === RoleCode.SUPERADMIN ? tenantIdFilter : currentUser.tenantId
+
+    const page = Math.max(1, Number(request.input('page', 1)))
+    const perPage = Math.min(100, Math.max(1, Number(request.input('perPage', 10))))
+
+    const q = (request.input('q') ?? '').toString().trim()
+    const sortBy = (request.input('sortBy') ?? 'created_at').toString()
+    const sortDir = (request.input('sortDir') ?? 'desc') as 'asc' | 'desc'
+
+    const query = Client.notDeleted()
+
+    if (targetTenantId !== undefined) {
+      query.where('tenant_id', targetTenantId)
+    }
+
+    if (q) {
+      query.where((builder) => {
+        builder
+          .whereILike('first_name', `%${q}%`)
+          .orWhereILike('last_name', `%${q}%`)
+          .orWhereILike('email', `%${q}%`)
+          .orWhereILike('phone', `%${q}%`)
+      })
+    }
+
+    query.orderBy(sortBy, sortDir)
+
+    const clients = await query.paginate(page, perPage)
+    const { meta, data } = clients.toJSON()
+
+    return response.status(200).send({
+      message: 'Clientes listados correctamente',
+      meta,
+      data,
+    })
+  }
+}

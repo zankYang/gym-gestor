@@ -1,12 +1,13 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
-import { UserFactory } from '#database/factories/user_factory'
+import { ClientFactory } from '#database/factories/client_factory'
 import { TenantFactory } from '#database/factories/tenant_factory'
 import ace from '@adonisjs/core/services/ace'
 import SyncRoles from '#commands/sync_roles'
 import SyncPermissions from '#commands/sync_permissions'
 import Role from '#models/role'
-import User from '#models/user'
+import Client from '#models/client'
+import { UserFactory } from '#database/factories/user_factory'
 import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
@@ -41,43 +42,44 @@ async function setupDb() {
   syncRoles.assertSucceeded()
 }
 
-test.group('User / List – autorización y filtros', (group) => {
+test.group('Client / List – autorización y filtros', (group) => {
   group.each.setup(setupDb)
 
-  test('listar usuarios con SUPERADMIN y tenantId -> 200', async ({ client, assert }) => {
+  test('listar clientes con SUPERADMIN y tenantId -> 200', async ({ client, assert }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const superadminUser = await UserFactory.merge({
       tenantId: tenantA.id,
       roleId: superadminRole.id,
     }).create()
 
-    await UserFactory.merge({ tenantId: tenantA.id, roleId: adminRole.id }).createMany(2)
-    await UserFactory.merge({ tenantId: tenantB.id, roleId: adminRole.id }).createMany(2)
+    await ClientFactory.merge({ tenantId: tenantA.id, createdBy: superadminUser.id }).createMany(2)
+    await ClientFactory.merge({ tenantId: tenantB.id, createdBy: superadminUser.id }).createMany(2)
 
     const response = await client
-      .get(`/api/users?tenantId=${tenantB.id}`)
+      .get(`/api/clients?tenantId=${tenantB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuarios listados correctamente')
+    assert.equal(body.message, 'Clientes listados correctamente')
     assert.isArray(body.data)
     assert.isDefined(body.meta)
     assert.equal(body.meta!.total, 2)
-    ;(body.data as { tenantId: number }[]).forEach((u) => assert.equal(u.tenantId, tenantB.id))
+    ;(body.data as { tenantId: number }[]).forEach((c) => assert.equal(c.tenantId, tenantB.id))
   })
 
-  test('listar usuarios con usuario normal (ADMIN) solo ve su tenant -> 200', async ({
+  test('listar clientes con usuario normal (ADMIN) solo ve su tenant -> 200', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const adminUser = await UserFactory.merge({
@@ -85,25 +87,27 @@ test.group('User / List – autorización y filtros', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    await UserFactory.merge({ tenantId: tenantA.id, roleId: adminRole.id }).createMany(2)
-    await UserFactory.merge({ tenantId: tenantB.id, roleId: adminRole.id }).createMany(2)
+    await ClientFactory.merge({ tenantId: tenantA.id, createdBy: adminUser.id }).createMany(2)
+    await ClientFactory.merge({ tenantId: tenantB.id, createdBy: adminUser.id }).createMany(2)
 
     const response = await client
-      .get('/api/users')
+      .get('/api/clients')
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuarios listados correctamente')
+    assert.equal(body.message, 'Clientes listados correctamente')
     assert.isArray(body.data)
-    assert.equal(body.meta!.total, 3) // adminUser + 2 del mismo tenant
-    ;(body.data as { tenantId: number }[]).forEach((u) => assert.equal(u.tenantId, tenantA.id))
+    assert.equal(body.meta!.total, 2)
+    ;(body.data as { tenantId: number }[]).forEach((c) => assert.equal(c.tenantId, tenantA.id))
   })
 
-  test('listar usuarios sin autenticación -> 401', async ({ client, assert }) => {
+  test('listar clientes sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
-    const response = await client.get('/api/users').header('Host', `${tenant.slug}.localhost:3333`)
+    const response = await client
+      .get('/api/clients')
+      .header('Host', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError
@@ -111,91 +115,42 @@ test.group('User / List – autorización y filtros', (group) => {
       errors: [{ message: 'Debes iniciar sesión para acceder a esta sección' }],
     })
   })
-
-  test('listar usuarios con filtro q, role, status y paginación -> 200', async ({
-    client,
-    assert,
-  }) => {
-    const tenant = await TenantFactory.create()
-    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
-
-    const superadminUser = await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: superadminRole.id,
-    }).create()
-
-    await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: adminRole.id,
-      firstName: 'Juan',
-      lastName: 'Pérez',
-      email: 'juan.perez@test.com',
-      status: Status.ACTIVE,
-    }).create()
-    await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: receptionistRole.id,
-      firstName: 'María',
-      lastName: 'García',
-      email: 'maria.garcia@test.com',
-      status: Status.INACTIVE,
-    }).create()
-
-    const response = await client
-      .get(
-        '/api/users?q=Juan&role=admin&status=Activo&page=1&perPage=5&sortBy=created_at&sortDir=asc'
-      )
-      .header('Host', `${tenant.slug}.localhost:3333`)
-      .loginAs(superadminUser)
-
-    response.assertStatus(200)
-    const body = response.body()! as Response
-    assert.equal(body.message, 'Usuarios listados correctamente')
-    assert.isArray(body.data)
-    assert.isTrue(
-      (body.data as { firstName: string }[]).every((u) =>
-        ['Juan', superadminUser.firstName].includes(u.firstName)
-      )
-    )
-  })
 })
 
-test.group('User / Show – autorización y tenant', (group) => {
+test.group('Client / Show – autorización y tenant', (group) => {
   group.each.setup(setupDb)
 
-  test('ver usuario SUPERADMIN puede ver usuario de otro tenant -> 200', async ({
+  test('ver cliente SUPERADMIN puede ver cliente de otro tenant -> 200', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const superadminUser = await UserFactory.merge({
       tenantId: tenantA.id,
       roleId: superadminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
+      createdBy: superadminUser.id,
     }).create()
 
     const response = await client
-      .get(`/api/users/${userInB.id}`)
+      .get(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario encontrado')
-    assert.equal((body.data as { id: number }).id, userInB.id)
+    assert.equal(body.message, 'Cliente encontrado')
+    assert.equal((body.data as { id: number }).id, clientInB.id)
   })
 
-  test('ver usuario normal (ADMIN) puede ver usuario de su tenant -> 200', async ({
+  test('ver cliente normal (ADMIN) puede ver cliente de su tenant -> 200', async ({
     client,
     assert,
   }) => {
@@ -207,28 +162,29 @@ test.group('User / Show – autorización y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const otherUser = await UserFactory.merge({
+    const otherClient = await ClientFactory.merge({
       tenantId: tenant.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
     }).create()
 
     const response = await client
-      .get(`/api/users/${otherUser.id}`)
+      .get(`/api/clients/${otherClient.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario encontrado')
-    assert.equal((body.data as { id: number }).id, otherUser.id)
+    assert.equal(body.message, 'Cliente encontrado')
+    assert.equal((body.data as { id: number }).id, otherClient.id)
   })
 
-  test('ver usuario normal intentando acceder a usuario de otro tenant -> 404', async ({
+  test('ver cliente normal intentando acceder a cliente de otro tenant -> 404', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const adminUser = await UserFactory.merge({
@@ -236,27 +192,37 @@ test.group('User / Show – autorización y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
     }).create()
 
     const response = await client
-      .get(`/api/users/${userInB.id}`)
+      .get(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
     const body = response.body()! as ResponseError
-    assert.deepEqual(body, { errors: [{ message: 'Usuario no encontrado' }] })
+    assert.deepEqual(body, { errors: [{ message: 'Cliente no encontrado' }] })
   })
 
-  test('ver usuario sin autenticación -> 401', async ({ client, assert }) => {
+  test('ver cliente sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
+
+    const adminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: adminRole.id,
+    }).create()
+
+    const clientInTenant = await ClientFactory.merge({
+      tenantId: tenant.id,
+      createdBy: adminUser.id,
+    }).create()
+
     const response = await client
-      .get(`/api/users/${user.id}`)
+      .get(`/api/clients/${clientInTenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
@@ -267,12 +233,13 @@ test.group('User / Show – autorización y tenant', (group) => {
   })
 })
 
-test.group('User / Create – validaciones y permisos', (group) => {
+test.group('Client / Create – validaciones y permisos', (group) => {
   group.each.setup(setupDb)
 
-  test('crear usuario SUPERADMIN en tenant específico -> 201', async ({ client, assert }) => {
+  test('crear cliente SUPERADMIN en tenant específico -> 201', async ({ client, assert }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
     const superadminUser = await UserFactory.merge({
@@ -283,26 +250,25 @@ test.group('User / Create – validaciones y permisos', (group) => {
     const payload = {
       tenantId: tenantB.id,
       firstName: 'Nuevo',
-      lastName: 'Usuario',
+      lastName: 'Cliente',
+      phone: '5551234567',
       email: 'nuevo@tenantb.com',
-      password: 'password123',
-      role: RoleCode.ADMIN,
+      status: Status.ACTIVE,
     }
 
     const response = await client
-      .post('/api/users')
+      .post('/api/clients')
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
     response.assertStatus(201)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario creado correctamente')
+    assert.equal(body.message, 'Cliente creado correctamente')
     assert.equal((body.data as { tenantId: number }).tenantId, tenantB.id)
-    assert.equal((body.data as { email: string }).email, payload.email)
   })
 
-  test('crear usuario normal (ADMIN) en su tenant -> 201', async ({ client, assert }) => {
+  test('crear cliente normal (ADMIN) en su tenant -> 201', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
@@ -313,103 +279,25 @@ test.group('User / Create – validaciones y permisos', (group) => {
 
     const payload = {
       firstName: 'Nuevo',
-      lastName: 'Usuario',
+      lastName: 'Cliente',
+      phone: '5559876543',
       email: 'nuevo@mitenant.com',
-      password: 'password123',
-      role: RoleCode.RECEPTIONIST,
+      status: Status.ACTIVE,
     }
 
     const response = await client
-      .post('/api/users')
+      .post('/api/clients')
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(adminUser)
 
     response.assertStatus(201)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario creado correctamente')
+    assert.equal(body.message, 'Cliente creado correctamente')
     assert.equal((body.data as { tenantId: number }).tenantId, tenant.id)
   })
 
-  test('crear usuario con email duplicado en mismo tenant -> 409', async ({ client, assert }) => {
-    const tenant = await TenantFactory.create()
-    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-
-    const superadminUser = await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: superadminRole.id,
-    }).create()
-
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    const existingUser = await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: adminRole.id,
-      email: 'existente@test.com',
-    }).create()
-
-    const payload = {
-      tenantId: tenant.id,
-      firstName: 'Otro',
-      lastName: 'Usuario',
-      email: existingUser.email,
-      password: 'password123',
-      role: RoleCode.ADMIN,
-    }
-
-    const response = await client
-      .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
-      .json(payload)
-      .loginAs(superadminUser)
-
-    response.assertStatus(409)
-    const body = response.body()! as ResponseError
-    assert.deepEqual(body, {
-      errors: [{ message: 'Ya existe un usuario con ese email en este gym' }],
-    })
-  })
-
-  test('crear usuario con mismo email en distinto tenant (SUPERADMIN) -> 201', async ({
-    client,
-    assert,
-  }) => {
-    const tenantA = await TenantFactory.create()
-    const tenantB = await TenantFactory.create()
-    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-
-    const superadminUser = await UserFactory.merge({
-      tenantId: tenantA.id,
-      roleId: superadminRole.id,
-    }).create()
-
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    await UserFactory.merge({
-      tenantId: tenantA.id,
-      roleId: adminRole.id,
-      email: 'mismo@email.com',
-    }).create()
-
-    const payload = {
-      tenantId: tenantB.id,
-      firstName: 'Otro',
-      lastName: 'Usuario',
-      email: 'mismo@email.com',
-      password: 'password123',
-      role: RoleCode.ADMIN,
-    }
-
-    const response = await client
-      .post('/api/users')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
-      .json(payload)
-      .loginAs(superadminUser)
-
-    response.assertStatus(201)
-    const body = response.body()! as Response
-    assert.equal((body.data as { tenantId: number }).tenantId, tenantB.id)
-  })
-
-  test('crear usuario con payload inválido (sin email) -> 422', async ({ client, assert }) => {
+  test('crear cliente con payload inválido (sin phone) -> 422', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -420,44 +308,13 @@ test.group('User / Create – validaciones y permisos', (group) => {
 
     const payload = {
       firstName: 'Nuevo',
-      lastName: 'Usuario',
-      password: 'password123',
-      role: RoleCode.ADMIN,
-    }
-
-    const response = await client
-      .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
-      .json(payload)
-      .loginAs(superadminUser)
-
-    response.assertStatus(422)
-    const body = response.body()! as ResponseError
-    assert.isArray(body.errors)
-    assert.isTrue(
-      body.errors.some((e) => e.field === 'email' || e.message?.toLowerCase().includes('email'))
-    )
-  })
-
-  test('crear usuario con password corta -> 422', async ({ client, assert }) => {
-    const tenant = await TenantFactory.create()
-    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-
-    const superadminUser = await UserFactory.merge({
-      tenantId: tenant.id,
-      roleId: superadminRole.id,
-    }).create()
-
-    const payload = {
-      firstName: 'Nuevo',
-      lastName: 'Usuario',
+      lastName: 'Cliente',
       email: 'nuevo@test.com',
-      password: 'short',
-      role: RoleCode.ADMIN,
+      status: Status.ACTIVE,
     }
 
     const response = await client
-      .post('/api/users')
+      .post('/api/clients')
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
@@ -466,23 +323,19 @@ test.group('User / Create – validaciones y permisos', (group) => {
     const body = response.body()! as ResponseError
     assert.isArray(body.errors)
     assert.isTrue(
-      body.errors.some(
-        (e) => e.field === 'password' || e.message?.toLowerCase().includes('password')
-      )
+      body.errors.some((e) => e.field === 'phone' || e.message?.toLowerCase().includes('phone'))
     )
   })
 
-  test('crear usuario sin autenticación -> 401', async ({ client, assert }) => {
+  test('crear cliente sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const response = await client
-      .post('/api/users')
+      .post('/api/clients')
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json({
         firstName: 'Nuevo',
-        lastName: 'Usuario',
-        email: 'nuevo@test.com',
-        password: 'password123',
-        role: RoleCode.ADMIN,
+        lastName: 'Cliente',
+        phone: '5551234567',
       })
 
     response.assertStatus(401)
@@ -493,42 +346,41 @@ test.group('User / Create – validaciones y permisos', (group) => {
   })
 })
 
-test.group('User / Update – validaciones y tenant', (group) => {
+test.group('Client / Update – validaciones y tenant', (group) => {
   group.each.setup(setupDb)
 
-  test('actualizar usuario SUPERADMIN puede actualizar usuario de otro tenant -> 200', async ({
+  test('actualizar cliente SUPERADMIN puede actualizar cliente de otro tenant -> 200', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const superadminUser = await UserFactory.merge({
       tenantId: tenantA.id,
       roleId: superadminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
-      firstName: 'Antes',
+      createdBy: superadminUser.id,
     }).create()
 
     const response = await client
-      .patch(`/api/users/${userInB.id}`)
+      .patch(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'Después' })
       .loginAs(superadminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario actualizado correctamente')
+    assert.equal(body.message, 'Cliente actualizado correctamente')
     assert.equal((body.data as { firstName: string }).firstName, 'Después')
   })
 
-  test('actualizar usuario normal (ADMIN) actualiza usuario de su tenant -> 200', async ({
+  test('actualizar cliente normal (ADMIN) actualiza cliente de su tenant -> 200', async ({
     client,
     assert,
   }) => {
@@ -540,14 +392,14 @@ test.group('User / Update – validaciones y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const otherUser = await UserFactory.merge({
+    const otherClient = await ClientFactory.merge({
       tenantId: tenant.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
       firstName: 'Antes',
     }).create()
 
     const response = await client
-      .patch(`/api/users/${otherUser.id}`)
+      .patch(`/api/clients/${otherClient.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Actualizado' })
       .loginAs(adminUser)
@@ -557,12 +409,13 @@ test.group('User / Update – validaciones y tenant', (group) => {
     assert.equal((body.data as { firstName: string }).firstName, 'Actualizado')
   })
 
-  test('actualizar usuario normal intentando actualizar usuario de otro tenant -> 404', async ({
+  test('actualizar cliente normal intentando actualizar cliente de otro tenant -> 404', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const adminUser = await UserFactory.merge({
@@ -570,39 +423,38 @@ test.group('User / Update – validaciones y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
     }).create()
 
     const response = await client
-      .patch(`/api/users/${userInB.id}`)
+      .patch(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'No' })
       .loginAs(adminUser)
 
     response.assertStatus(404)
     const body = response.body()! as ResponseError
-    assert.deepEqual(body, { errors: [{ message: 'Usuario no encontrado' }] })
+    assert.deepEqual(body, { errors: [{ message: 'Cliente no encontrado' }] })
   })
 
-  test('actualizar usuario con email inválido -> 422', async ({ client, assert }) => {
+  test('actualizar cliente con email inválido -> 422', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const superadminUser = await UserFactory.merge({
       tenantId: tenant.id,
       roleId: superadminRole.id,
     }).create()
 
-    const targetUser = await UserFactory.merge({
+    const targetClient = await ClientFactory.merge({
       tenantId: tenant.id,
-      roleId: adminRole.id,
+      createdBy: superadminUser.id,
     }).create()
 
     const response = await client
-      .patch(`/api/users/${targetUser.id}`)
+      .patch(`/api/clients/${targetClient.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json({ email: 'no-es-email' })
       .loginAs(superadminUser)
@@ -615,12 +467,21 @@ test.group('User / Update – validaciones y tenant', (group) => {
     )
   })
 
-  test('actualizar usuario sin autenticación -> 401', async ({ client, assert }) => {
+  test('actualizar cliente sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
+    const adminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: adminRole.id,
+    }).create()
+
+    const clientInTenant = await ClientFactory.merge({
+      tenantId: tenant.id,
+      createdBy: adminUser.id,
+    }).create()
+
     const response = await client
-      .patch(`/api/users/${user.id}`)
+      .patch(`/api/clients/${clientInTenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Nuevo' })
 
@@ -632,42 +493,42 @@ test.group('User / Update – validaciones y tenant', (group) => {
   })
 })
 
-test.group('User / Destroy – soft delete y tenant', (group) => {
+test.group('Client / Destroy – soft delete y tenant', (group) => {
   group.each.setup(setupDb)
 
-  test('borrar usuario SUPERADMIN puede borrar usuario de otro tenant -> 200', async ({
+  test('borrar cliente SUPERADMIN puede borrar cliente de otro tenant -> 200', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
-    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const superadminUser = await UserFactory.merge({
       tenantId: tenantA.id,
       roleId: superadminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
+      createdBy: superadminUser.id,
     }).create()
 
     const response = await client
-      .delete(`/api/users/${userInB.id}`)
+      .delete(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario dado de baja correctamente')
+    assert.equal(body.message, 'Cliente dado de baja correctamente')
 
-    const deleted = await User.query().where('id', userInB.id).first()
+    const deleted = await Client.query().where('id', clientInB.id).first()
     assert.isNotNull(deleted?.deletedAt)
   })
 
-  test('borrar usuario normal (ADMIN) puede borrar usuario de su tenant -> 200', async ({
+  test('borrar cliente normal (ADMIN) puede borrar cliente de su tenant -> 200', async ({
     client,
     assert,
   }) => {
@@ -679,30 +540,31 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const otherUser = await UserFactory.merge({
+    const otherClient = await ClientFactory.merge({
       tenantId: tenant.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
     }).create()
 
     const response = await client
-      .delete(`/api/users/${otherUser.id}`)
+      .delete(`/api/clients/${otherClient.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.equal(body.message, 'Usuario dado de baja correctamente')
+    assert.equal(body.message, 'Cliente dado de baja correctamente')
 
-    const deleted = await User.query().where('id', otherUser.id).first()
+    const deleted = await Client.query().where('id', otherClient.id).first()
     assert.isNotNull(deleted?.deletedAt)
   })
 
-  test('borrar usuario normal intentando borrar usuario de otro tenant -> 404', async ({
+  test('borrar cliente normal intentando borrar cliente de otro tenant -> 404', async ({
     client,
     assert,
   }) => {
     const tenantA = await TenantFactory.create()
     const tenantB = await TenantFactory.create()
+
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
 
     const adminUser = await UserFactory.merge({
@@ -710,22 +572,22 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
       roleId: adminRole.id,
     }).create()
 
-    const userInB = await UserFactory.merge({
+    const clientInB = await ClientFactory.merge({
       tenantId: tenantB.id,
-      roleId: adminRole.id,
+      createdBy: adminUser.id,
     }).create()
 
     const response = await client
-      .delete(`/api/users/${userInB.id}`)
+      .delete(`/api/clients/${clientInB.id}`)
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
     const body = response.body()! as ResponseError
-    assert.deepEqual(body, { errors: [{ message: 'Usuario no encontrado' }] })
+    assert.deepEqual(body, { errors: [{ message: 'Cliente no encontrado' }] })
   })
 
-  test('borrar usuario inexistente -> 404', async ({ client, assert }) => {
+  test('borrar cliente inexistente -> 404', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
 
@@ -735,21 +597,31 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
     }).create()
 
     const response = await client
-      .delete('/api/users/999999')
+      .delete('/api/clients/999999')
       .header('Host', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(404)
     const body = response.body()! as ResponseError
-    assert.deepEqual(body, { errors: [{ message: 'Usuario no encontrado' }] })
+    assert.deepEqual(body, { errors: [{ message: 'Cliente no encontrado' }] })
   })
 
-  test('borrar usuario sin autenticación -> 401', async ({ client, assert }) => {
+  test('borrar cliente sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-    const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
+
+    const adminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: adminRole.id,
+    }).create()
+
+    const clientInTenant = await ClientFactory.merge({
+      tenantId: tenant.id,
+      createdBy: adminUser.id,
+    }).create()
+
     const response = await client
-      .delete(`/api/users/${user.id}`)
+      .delete(`/api/clients/${clientInTenant.id}`)
       .header('Host', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)

@@ -60,6 +60,29 @@ router
       .as('users')
       .use([middleware.auth(), middleware.hasPermissions([PermissionCode.USERS_MANAGE])])
 
+    // Client routes
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.client.ListClients, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.CLIENTS_READ])])
+        router
+          .post('/', [controllers.client.CreateClient, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.CLIENTS_WRITE])])
+        router
+          .get('/:id', [controllers.client.ShowClient, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.CLIENTS_READ])])
+        router
+          .patch('/:id', [controllers.client.UpdateClient, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.CLIENTS_WRITE])])
+        router
+          .delete('/:id', [controllers.client.DestroyClient, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.CLIENTS_DELETE])])
+      })
+      .prefix('/clients')
+      .as('clients')
+      .use([middleware.auth()])
+
     // Auth routes
     router
       .group(() => {

@@ -13,6 +13,13 @@ export const controllers = {
   auth: {
     AccessToken: () => import('#controllers/auth/access_token_controller'),
   },
+  client: {
+    CreateClient: () => import('#controllers/client/create_client_controller'),
+    DestroyClient: () => import('#controllers/client/destroy_client_controller'),
+    ListClients: () => import('#controllers/client/list_clients_controller'),
+    ShowClient: () => import('#controllers/client/show_client_controller'),
+    UpdateClient: () => import('#controllers/client/update_client_controller'),
+  },
   user: {
     CreateUser: () => import('#controllers/user/create_user_controller'),
     DestroyUser: () => import('#controllers/user/destroy_user_controller'),

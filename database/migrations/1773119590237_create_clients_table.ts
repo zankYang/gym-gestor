@@ -26,13 +26,17 @@ export default class extends BaseSchema {
 
       table.string('first_name', 100).notNullable()
       table.string('last_name', 100).notNullable()
+      table.string('gender', 30).nullable()
       table.string('email', 150).nullable()
       table.string('phone', 30).notNullable()
       table.date('birth_date').nullable()
-      table.string('gender', 30).nullable()
+
+      table.decimal('height', 10, 2).nullable()
+      table.decimal('weight', 10, 2).nullable()
+      table.text('medical_notes').nullable()
+
       table.string('emergency_contact_name', 150).nullable()
       table.string('emergency_contact_phone', 30).nullable()
-      table.text('medical_notes').nullable()
       table.text('notes').nullable()
       table.string('status', 20).notNullable().defaultTo(Status.ACTIVE)
       table.timestamp('joined_at', { useTz: true }).notNullable().defaultTo(this.now())

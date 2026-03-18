@@ -46,7 +46,6 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
     })
 
     const tenantDB = await Tenant.findOrFail(tenant.id)
-    console.log(tenantDB.deletedAt)
     assert.isNotNull(tenantDB.deletedAt)
   })
 

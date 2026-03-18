@@ -1,5 +1,7 @@
+import { DateTime } from 'luxon'
 import { ClientSchema } from '#database/schema'
 import { belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Tenant from '#models/tenant'
 import Branch from '#models/branch'
@@ -10,6 +12,15 @@ import Routine from '#models/routine'
 import ClassReservation from '#models/class_reservation'
 
 export default class Client extends ClientSchema {
+  static notDeleted(): ModelQueryBuilderContract<typeof Client, Client> {
+    return this.query().whereNull('deleted_at')
+  }
+
+  async softDelete(): Promise<void> {
+    this.deletedAt = DateTime.utc()
+    await this.save()
+  }
+
   @belongsTo(() => Tenant)
   declare tenant: BelongsTo<typeof Tenant>
 
