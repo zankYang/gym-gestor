@@ -1,9 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
-import Role from '#models/role'
 import { updateUserValidator } from '#validators/user'
 import { RoleCode } from '#enums/role_enum'
-import hash from '@adonisjs/core/services/hash'
 
 export default class UpdateUserController {
   async update({ auth, params, request, response }: HttpContext) {
@@ -19,21 +17,14 @@ export default class UpdateUserController {
       query = query.where('tenant_id', currentUser.tenantId)
     }
 
-    const user = await query.firstOrFail()
-
-    const updateData: Record<string, any> = {}
-
-    if (payload.firstName !== undefined) updateData.firstName = payload.firstName
-    if (payload.lastName !== undefined) updateData.lastName = payload.lastName
-    if (payload.email !== undefined) updateData.email = payload.email
-    if (payload.status !== undefined) updateData.status = payload.status
-    if (payload.password) updateData.passwordHash = await hash.make(payload.password)
-    if (payload.role) {
-      const roleRecord = await Role.findByOrFail('code', payload.role)
-      updateData.roleId = roleRecord.id
+    const user = await query.first()
+    if (!user) {
+      return response.status(404).send({
+        errors: [{ message: 'Usuario no encontrado' }],
+      })
     }
 
-    user.merge(updateData)
+    user.merge(payload)
     await user.save()
 
     return response.status(200).send({

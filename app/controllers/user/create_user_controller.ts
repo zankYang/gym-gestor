@@ -9,10 +9,8 @@ export default class CreateUserController {
   async store({ auth, request, response }: HttpContext) {
     const payload = await request.validateUsing(createUserValidator)
     const currentUser = auth.getUserOrFail()
-
-    await currentUser.related('role').query().firstOrFail()
+    await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
-
     const targetTenantId =
       currentRole === RoleCode.SUPERADMIN ? payload.tenantId : currentUser.tenantId
 
@@ -28,7 +26,6 @@ export default class CreateUserController {
     }
 
     const roleRecord = await Role.findByOrFail('code', payload.role)
-
     const user = await User.create({
       tenantId: targetTenantId,
       avatarUrl: payload.avatarUrl,

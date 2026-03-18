@@ -42,6 +42,7 @@ test.group('Admin / Tenant – autorización de permisos', (group) => {
     assert.deepEqual(body, {
       message: 'Tenants listados correctamente',
       data: response.body()!.data,
+      meta: response.body()!.meta,
     })
   })
 
