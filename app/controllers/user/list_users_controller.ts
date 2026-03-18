@@ -6,31 +6,33 @@ export default class ListUsersController {
   async index({ auth, response, request }: HttpContext) {
     const currentUser = auth.getUserOrFail()
     await currentUser.load((preloader) => preloader.load('role'))
-    const currentRole = (currentUser.role as any).code as string
+    const currentRole = currentUser.role.code
+    const requestedTenantId = request.input('tenantId')
+    const tenantIdFilter =
+      requestedTenantId !== undefined && !Number.isNaN(Number(requestedTenantId))
+        ? Number(requestedTenantId)
+        : undefined
+
+    const targetTenantId =
+      currentRole === RoleCode.SUPERADMIN ? tenantIdFilter : currentUser.tenantId
 
     const page = Math.max(1, Number(request.input('page', 1)))
     const perPage = Math.min(100, Math.max(1, Number(request.input('perPage', 10))))
     const q = (request.input('q') ?? '').toString().trim()
     const roleFilter = request.input('role') as string | undefined
-    const status = request.input('status') as string | undefined
+    const statusFilter = request.input('status') as string | undefined
     const sortBy = (request.input('sortBy') ?? 'created_at').toString()
-    let tenantIdFilter: number | undefined
-
-    if (currentRole === RoleCode.SUPERADMIN) {
-      tenantIdFilter = request.input('tenantId') as number
-    }
-
     const sortDir = (request.input('sortDir') ?? 'desc') as 'asc' | 'desc'
 
     const query = User.notDeleted()
 
-    if (currentUser.tenantId) {
-      query.where('tenant_id', currentUser.tenantId)
-    } else if (tenantIdFilter !== undefined && !Number.isNaN(Number(tenantIdFilter))) {
-      query.where('tenant_id', Number(tenantIdFilter))
+    if (targetTenantId !== undefined) {
+      query.where('tenant_id', targetTenantId)
     }
 
-    if (status) query.where('status', status)
+    if (statusFilter) {
+      query.where('status', statusFilter)
+    }
 
     if (roleFilter) {
       query.whereHas('role', (builder) => {

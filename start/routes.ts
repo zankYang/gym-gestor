@@ -37,20 +37,28 @@ router
       .prefix('/admin')
       .as('admin')
       .use([middleware.auth(), middleware.hasPermissions([PermissionCode.TENANTS_READ])])
-
     // User routes
     router
       .group(() => {
-        router.get('/', [controllers.user.ListUsers, 'index'])
-
-        router.post('/', [controllers.user.CreateUser, 'store'])
-        router.get('/:id', [controllers.user.ShowUser, 'show'])
-        router.patch('/:id', [controllers.user.UpdateUser, 'update'])
-        router.delete('/:id', [controllers.user.DestroyUser, 'destroy'])
+        router
+          .get('/', [controllers.user.ListUsers, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.USERS_READ])])
+        router
+          .post('/', [controllers.user.CreateUser, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.USERS_WRITE])])
+        router
+          .get('/:id', [controllers.user.ShowUser, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.USERS_READ])])
+        router
+          .patch('/:id', [controllers.user.UpdateUser, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.USERS_WRITE])])
+        router
+          .delete('/:id', [controllers.user.DestroyUser, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.USERS_DELETE])])
       })
       .prefix('/users')
       .as('users')
-      .use([middleware.auth()])
+      .use([middleware.auth(), middleware.hasPermissions([PermissionCode.USERS_MANAGE])])
 
     // Auth routes
     router

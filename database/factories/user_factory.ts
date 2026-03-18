@@ -11,6 +11,7 @@ export const UserFactory = factory
       lastName: faker.person.lastName(),
       email: faker.internet.email(),
       passwordHash: '12345678',
+      avatarUrl: faker.image.url(),
       roleId: 1,
       status: faker.helpers.arrayElement([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]),
     }

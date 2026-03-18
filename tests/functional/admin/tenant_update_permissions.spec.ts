@@ -44,8 +44,6 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const body = response.body()
 
-    console.log(body)
-
     assert.equal(body.message, 'Tenant actualizado correctamente')
     assert.equal(body.data.name, 'Nombre Actualizado')
     assert.equal(body.data.id, tenant.id)

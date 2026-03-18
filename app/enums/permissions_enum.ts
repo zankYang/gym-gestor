@@ -10,6 +10,9 @@ export enum PermissionModule {
 
 export enum PermissionCode {
   // auth
+  USERS_READ = 'users:read',
+  USERS_WRITE = 'users:write',
+  USERS_DELETE = 'users:delete',
   USERS_MANAGE = 'users:manage',
   ROLES_MANAGE = 'roles:manage',
 

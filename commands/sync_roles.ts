@@ -17,6 +17,9 @@ export default class SyncRoles extends BaseCommand {
 
     // Permisos exclusivos del admin dentro de su tenant (gestión completa)
     const ADMIN_PERMISSIONS: PermissionCode[] = [
+      PermissionCode.USERS_READ,
+      PermissionCode.USERS_WRITE,
+      PermissionCode.USERS_DELETE,
       PermissionCode.USERS_MANAGE,
       PermissionCode.ROLES_MANAGE,
       PermissionCode.CLIENTS_READ,
