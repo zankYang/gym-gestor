@@ -6,10 +6,8 @@ import ace from '@adonisjs/core/services/ace'
 import SyncRoles from '#commands/sync_roles'
 import SyncPermissions from '#commands/sync_permissions'
 import Role from '#models/role'
-import Permission from '#models/permission'
 import User from '#models/user'
 import { RoleCode } from '#enums/role_enum'
-import { PermissionCode } from '#enums/permissions_enum'
 import { Status } from '#enums/status_enum'
 
 type Response = {
@@ -41,11 +39,6 @@ async function setupDb() {
   const syncRoles = await ace.create(SyncRoles, [])
   await syncRoles.exec()
   syncRoles.assertSucceeded()
-
-  // Dar USERS_MANAGE al rol ADMIN para poder probar "usuario normal" (mismo tenant)
-  const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
-  const usersManagePermission = await Permission.findByOrFail('code', PermissionCode.USERS_MANAGE)
-  await adminRole.related('permissions').attach([usersManagePermission.id])
 }
 
 test.group('User / List – autorización y filtros', (group) => {
@@ -100,6 +93,7 @@ test.group('User / List – autorización y filtros', (group) => {
       .header('Host', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
+    console.log(response.body())
     response.assertStatus(200)
     const body = response.body()! as Response
     assert.equal(body.message, 'Usuarios listados correctamente')

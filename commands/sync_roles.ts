@@ -20,6 +20,7 @@ export default class SyncRoles extends BaseCommand {
       PermissionCode.USERS_READ,
       PermissionCode.USERS_WRITE,
       PermissionCode.USERS_DELETE,
+      PermissionCode.USERS_MANAGE,
       PermissionCode.ROLES_MANAGE,
       PermissionCode.CLIENTS_READ,
       PermissionCode.CLIENTS_WRITE,
