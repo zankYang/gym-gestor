@@ -2,12 +2,6 @@ import vine from '@vinejs/vine'
 import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
-const numericString = () =>
-  vine
-    .string()
-    .trim()
-    .regex(/^[0-9]+$/)
-
 const firstName = () => vine.string().trim().minLength(1).maxLength(100)
 const lastName = () => vine.string().trim().minLength(1).maxLength(100)
 const email = () => vine.string().email().maxLength(150)
@@ -62,8 +56,8 @@ const roleFilterEnum = () =>
   vine.string().in([RoleCode.SUPERADMIN, RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH])
 
 export const listUsersQueryValidator = vine.create({
-  page: numericString().optional(),
-  perPage: numericString().optional(),
+  page: vine.number().optional(),
+  perPage: vine.number().optional(),
   q: vine.string().trim().maxLength(100).optional(),
   role: roleFilterEnum().optional(),
   status: statusEnum().optional(),
@@ -72,5 +66,5 @@ export const listUsersQueryValidator = vine.create({
 })
 
 export const tenantIdQueryValidator = vine.create({
-  tenantId: numericString().optional(),
+  tenantId: vine.number().optional(),
 })

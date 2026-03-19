@@ -1,12 +1,6 @@
 import vine from '@vinejs/vine'
 import { Status } from '#enums/status_enum'
 
-const numericString = () =>
-  vine
-    .string()
-    .trim()
-    .regex(/^[0-9]+$/)
-
 const firstName = () => vine.string().trim().minLength(1).maxLength(100)
 const lastName = () => vine.string().trim().minLength(1).maxLength(100)
 const phone = () => vine.string().trim().minLength(1).maxLength(30)
@@ -65,13 +59,13 @@ export const updateClientValidator = vine.create({
  * SUPERADMIN), para mantener compatibilidad cuando el filtro se ignora.
  */
 export const listClientsQueryValidator = vine.create({
-  page: numericString().optional(),
-  perPage: numericString().optional(),
+  page: vine.number().optional(),
+  perPage: vine.number().optional(),
   q: vine.string().trim().maxLength(100).optional(),
   sortBy: vine.string().trim().maxLength(50).optional(),
   sortDir: vine.string().in(['asc', 'desc']).optional(),
 })
 
 export const tenantIdQueryValidator = vine.create({
-  tenantId: numericString().optional(),
+  tenantId: vine.number().optional(),
 })
