@@ -115,6 +115,71 @@ test.group('Client / List – autorización y filtros', (group) => {
       errors: [{ message: 'Debes iniciar sesión para acceder a esta sección' }],
     })
   })
+
+  test('listar clientes con page inválido -> 422', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const response = await client
+      .get('/api/clients?page=abc')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+      .loginAs(superadminUser)
+
+    response.assertStatus(422)
+    const body = response.body()! as ResponseError
+    assert.isTrue(body.errors.some((e) => e.field === 'page'))
+  })
+
+  test('listar clientes con sortDir inválido -> 422', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const response = await client
+      .get('/api/clients?sortDir=NOPE')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+      .loginAs(superadminUser)
+
+    response.assertStatus(422)
+    const body = response.body()! as ResponseError
+    assert.isTrue(body.errors.some((e) => e.field === 'sortDir'))
+  })
+
+  test('listar clientes con tenantId inválido en ADMIN -> 200 (se ignora)', async ({
+    client,
+    assert,
+  }) => {
+    const tenantA = await TenantFactory.create()
+    const tenantB = await TenantFactory.create()
+    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
+
+    const adminUser = await UserFactory.merge({
+      tenantId: tenantA.id,
+      roleId: adminRole.id,
+    }).create()
+
+    await ClientFactory.merge({ tenantId: tenantA.id, createdBy: adminUser.id }).create()
+    await ClientFactory.merge({ tenantId: tenantB.id, createdBy: adminUser.id }).create()
+
+    const response = await client
+      .get('/api/clients?tenantId=abc')
+      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .loginAs(adminUser)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.isArray(body.data)
+    assert.isTrue((body.data as { tenantId: number }[]).every((c) => c.tenantId === tenantA.id))
+  })
 })
 
 test.group('Client / Show – autorización y tenant', (group) => {

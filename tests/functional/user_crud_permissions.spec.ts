@@ -160,6 +160,89 @@ test.group('User / List – autorización y filtros', (group) => {
       )
     )
   })
+
+  test('listar usuarios con page inválido -> 422', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const response = await client
+      .get('/api/users?page=abc')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+      .loginAs(superadminUser)
+
+    response.assertStatus(422)
+    const body = response.body()! as ResponseError
+    assert.isTrue(body.errors.some((e) => e.field === 'page'))
+  })
+
+  test('listar usuarios con sortDir inválido -> 422', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const response = await client
+      .get('/api/users?sortDir=NOPE')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+      .loginAs(superadminUser)
+
+    response.assertStatus(422)
+    const body = response.body()! as ResponseError
+    assert.isTrue(body.errors.some((e) => e.field === 'sortDir'))
+  })
+
+  test('listar usuarios con status inválido -> 422', async ({ client, assert }) => {
+    const tenant = await TenantFactory.create()
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const response = await client
+      .get('/api/users?status=NoExiste')
+      .header('Host', `${tenant.slug}.localhost:3333`)
+      .loginAs(superadminUser)
+
+    response.assertStatus(422)
+    const body = response.body()! as ResponseError
+    assert.isTrue(body.errors.some((e) => e.field === 'status'))
+  })
+
+  test('listar usuarios con tenantId inválido en ADMIN -> 200 (se ignora)', async ({
+    client,
+    assert,
+  }) => {
+    const tenantA = await TenantFactory.create()
+    const tenantB = await TenantFactory.create()
+    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
+
+    const adminUser = await UserFactory.merge({
+      tenantId: tenantA.id,
+      roleId: adminRole.id,
+    }).create()
+
+    await UserFactory.merge({ tenantId: tenantA.id, roleId: adminRole.id }).create()
+    await UserFactory.merge({ tenantId: tenantB.id, roleId: adminRole.id }).create()
+
+    const response = await client
+      .get('/api/users?tenantId=abc')
+      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .loginAs(adminUser)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.isTrue((body.data as { tenantId: number }[]).every((u) => u.tenantId === tenantA.id))
+  })
 })
 
 test.group('User / Show – autorización y tenant', (group) => {

@@ -2,6 +2,12 @@ import vine from '@vinejs/vine'
 import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
 
+const numericString = () =>
+  vine
+    .string()
+    .trim()
+    .regex(/^[0-9]+$/)
+
 const firstName = () => vine.string().trim().minLength(1).maxLength(100)
 const lastName = () => vine.string().trim().minLength(1).maxLength(100)
 const email = () => vine.string().email().maxLength(150)
@@ -44,4 +50,27 @@ export const updateUserValidator = vine.create({
   password: password().optional(),
   role: roleEnum().optional(),
   status: statusEnum().optional(),
+})
+
+/**
+ * Query validator for GET /api/users
+ *
+ * Nota: `tenantId` se valida de forma condicional en el controlador (solo para
+ * SUPERADMIN), para mantener compatibilidad cuando el filtro se ignora.
+ */
+const roleFilterEnum = () =>
+  vine.string().in([RoleCode.SUPERADMIN, RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH])
+
+export const listUsersQueryValidator = vine.create({
+  page: numericString().optional(),
+  perPage: numericString().optional(),
+  q: vine.string().trim().maxLength(100).optional(),
+  role: roleFilterEnum().optional(),
+  status: statusEnum().optional(),
+  sortBy: vine.string().trim().maxLength(50).optional(),
+  sortDir: vine.string().in(['asc', 'desc']).optional(),
+})
+
+export const tenantIdQueryValidator = vine.create({
+  tenantId: numericString().optional(),
 })

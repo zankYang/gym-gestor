@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { RoleCode } from '#enums/role_enum'
+import { listUsersQueryValidator, tenantIdQueryValidator } from '#validators/user'
 
 export default class ListUsersController {
   async index({ auth, response, request }: HttpContext) {
@@ -8,18 +9,26 @@ export default class ListUsersController {
     await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
 
-    const requestedTenantId = request.input('tenantId') ? Number(request.input('tenantId')) : undefined
+    // tenantId solo se valida si el rol es SUPERADMIN.
+    // En otros roles el filtro es ignorado (compatibilidad).
+    let requestedTenantId: number | undefined
+    if (currentRole === RoleCode.SUPERADMIN) {
+      const { tenantId } = await request.validateUsing(tenantIdQueryValidator)
+      requestedTenantId = tenantId !== undefined ? Number(tenantId) : undefined
+    }
 
     const targetTenantId =
       currentRole === RoleCode.SUPERADMIN ? requestedTenantId : currentUser.tenantId
 
-    const page = Math.max(1, Number(request.input('page', 1)))
-    const perPage = Math.min(100, Math.max(1, Number(request.input('perPage', 10))))
-    const q = (request.input('q') ?? '').toString().trim()
-    const roleFilter = request.input('role') as string | undefined
-    const statusFilter = request.input('status') as string | undefined
-    const sortBy = (request.input('sortBy') ?? 'created_at').toString()
-    const sortDir = (request.input('sortDir') ?? 'desc') as 'asc' | 'desc'
+    const filters = await request.validateUsing(listUsersQueryValidator)
+
+    const page = Math.max(1, Number(filters.page ?? 1))
+    const perPage = Math.min(100, Math.max(1, Number(filters.perPage ?? 10)))
+    const q = (filters.q ?? '').toString().trim()
+    const roleFilter = filters.role as string | undefined
+    const statusFilter = filters.status as string | undefined
+    const sortBy = (filters.sortBy ?? 'created_at').toString()
+    const sortDir = (filters.sortDir ?? 'desc') as 'asc' | 'desc'
 
     const query = User.notDeleted()
 
