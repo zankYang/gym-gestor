@@ -1,8 +1,15 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Tenant from '#models/tenant'
+import { RoleCode } from '#enums/role_enum'
 
 export default class ListTenantsController {
-  async index({ response, request }: HttpContext) {
+  async index({ consumer, response, request }: HttpContext) {
+    if (consumer.role.code !== RoleCode.SUPERADMIN) {
+      return response.status(403).send({
+        errors: [{ message: 'No tienes los permisos necesarios para realizar esta acción' }],
+      })
+    }
+
     const {
       page: rawPage = 1,
       perPage: rawPerPage = 10,

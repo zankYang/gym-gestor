@@ -36,7 +36,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
 
     const response = await client
       .delete(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(user)
 
     response.assertStatus(200)
@@ -60,7 +60,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
 
     const response = await client
       .delete('/api/admin/tenants/999999')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(user)
 
     response.assertStatus(404)
@@ -85,7 +85,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
 
     const response = await client
       .delete(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(user)
 
     response.assertStatus(403)
@@ -108,7 +108,7 @@ test.group('Admin / Tenant – eliminar tenant', (group) => {
 
     const response = await client
       .delete(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
 

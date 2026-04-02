@@ -23,7 +23,8 @@ export const createClientValidator = vine.create({
   gender: gender().optional(),
 
   birthDate: vine.date().optional(),
-
+  height: vine.number().optional(),
+  weight: vine.number().optional(),
   emergencyContactName: vine.string().trim().maxLength(150).optional(),
   emergencyContactPhone: vine.string().trim().maxLength(30).optional(),
   medicalNotes: vine.string().trim().optional(),
@@ -43,7 +44,8 @@ export const updateClientValidator = vine.create({
   email: email().optional(),
   gender: gender().optional(),
   birthDate: vine.date().optional(),
-
+  height: vine.string().optional(),
+  weight: vine.string().optional(),
   emergencyContactName: vine.string().trim().maxLength(150).optional(),
   emergencyContactPhone: vine.string().trim().maxLength(30).optional(),
   medicalNotes: vine.string().trim().optional(),
@@ -62,6 +64,7 @@ export const listClientsQueryValidator = vine.create({
   page: vine.number().optional(),
   perPage: vine.number().optional(),
   q: vine.string().trim().maxLength(100).optional(),
+  status: statusEnum().optional(),
   sortBy: vine.string().trim().maxLength(50).optional(),
   sortDir: vine.string().in(['asc', 'desc']).optional(),
 })

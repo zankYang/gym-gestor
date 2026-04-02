@@ -83,6 +83,104 @@ router
       .as('clients')
       .use([middleware.auth()])
 
+    // Plan routes
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.plan.ListPlans, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.PLANS_MANAGE])])
+        router
+          .post('/', [controllers.plan.CreatePlan, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.PLANS_MANAGE])])
+        router
+          .get('/:id', [controllers.plan.ShowPlan, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.PLANS_MANAGE])])
+        router
+          .patch('/:id', [controllers.plan.UpdatePlan, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.PLANS_MANAGE])])
+        router
+          .delete('/:id', [controllers.plan.DestroyPlan, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.PLANS_MANAGE])])
+      })
+      .prefix('/plans')
+      .as('plans')
+      .use([middleware.auth()])
+
+    // Memberships (socios)
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.membership.ListMemberships, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.MEMBERSHIPS_VIEW])])
+        router
+          .post('/', [controllers.membership.CreateMembership, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.MEMBERSHIPS_MANAGE])])
+        router
+          .get('/:id', [controllers.membership.ShowMembership, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.MEMBERSHIPS_VIEW])])
+        router
+          .patch('/:id', [controllers.membership.UpdateMembership, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.MEMBERSHIPS_MANAGE])])
+        router
+          .delete('/:id', [controllers.membership.DestroyMembership, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.MEMBERSHIPS_MANAGE])])
+      })
+      .prefix('/memberships')
+      .as('memberships')
+      .use([middleware.auth()])
+
+    // Payments (cobros)
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.payment.ListPayments, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.PAYMENTS_READ])])
+        router
+          .post('/', [controllers.payment.CreatePayment, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.PAYMENTS_WRITE])])
+        router
+          .get('/:id', [controllers.payment.ShowPayment, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.PAYMENTS_READ])])
+        router
+          .patch('/:id', [controllers.payment.UpdatePayment, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.PAYMENTS_WRITE])])
+        router
+          .post('/:id/cancel', [controllers.payment.CancelPayment, 'cancel'])
+          .use([middleware.hasPermissions([PermissionCode.PAYMENTS_CANCEL])])
+      })
+      .prefix('/payments')
+      .as('payments')
+      .use([middleware.auth()])
+
+    // Attendances (asistencias)
+    router
+      .group(() => {
+        router
+          .get('/', [controllers.attendance.ListAttendances, 'index'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_VIEW])])
+        router
+          .post('/', [controllers.attendance.CreateAttendance, 'store'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_MANAGE])])
+        router
+          .get('/:id', [controllers.attendance.ShowAttendance, 'show'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_VIEW])])
+        router
+          .patch('/:id', [controllers.attendance.UpdateAttendance, 'update'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_MANAGE])])
+        router
+          .delete('/:id', [controllers.attendance.DestroyAttendance, 'destroy'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_DELETE])])
+        router
+          .post('/checkin', [controllers.attendance.CheckinAttendance, 'checkin'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCE_CHECKIN])])
+        router
+          .post('/:id/checkout', [controllers.attendance.CheckoutAttendance, 'checkout'])
+          .use([middleware.hasPermissions([PermissionCode.ATTENDANCES_CHECKOUT])])
+      })
+      .prefix('/attendances')
+      .as('attendances')
+      .use([middleware.auth()])
+
     // Auth routes
     router
       .group(() => {
@@ -91,6 +189,12 @@ router
       })
       .prefix('/auth')
       .as('auth')
+    // Catalogs routes
+    router.get('tenant-config', [controllers.auth.AccessToken, 'index'])
+    router.get('permissions', [controllers.auth.AccessToken, 'filter']).use([middleware.auth()])
+    router
+      .get('catalog-roles', [controllers.auth.catalog.CatalogsRole, 'index'])
+      .use([middleware.auth()])
   })
   .prefix('/api')
   .use([middleware.identifyTenant()])

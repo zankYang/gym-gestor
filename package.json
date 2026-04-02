@@ -74,6 +74,7 @@
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.0.0",
     "@vinejs/vine": "^4.3.0",
+    "adonisjs-scheduler": "^2.7.0",
     "better-sqlite3": "^12.6.2",
     "luxon": "^3.7.2",
     "pg": "^8.19.0",

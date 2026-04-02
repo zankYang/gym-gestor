@@ -6,13 +6,10 @@ import { Status } from '#enums/status_enum'
 import { RoleCode } from '#enums/role_enum'
 
 export default class CreateUserController {
-  async store({ auth, request, response }: HttpContext) {
+  async store({ consumer, request, response }: HttpContext) {
     const payload = await request.validateUsing(createUserValidator)
-    const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
-    const currentRole = currentUser.role.code
     const targetTenantId =
-      currentRole === RoleCode.SUPERADMIN ? payload.tenantId : currentUser.tenantId
+      consumer.role.code === RoleCode.SUPERADMIN ? payload.tenantId : consumer.tenantId
 
     const existingUser = await User.notDeleted()
       .where('email', payload.email)
@@ -32,6 +29,7 @@ export default class CreateUserController {
       firstName: payload.firstName,
       lastName: payload.lastName,
       email: payload.email,
+      phone: payload.phone,
       passwordHash: payload.password,
       roleId: roleRecord.id,
       status: Status.ACTIVE,

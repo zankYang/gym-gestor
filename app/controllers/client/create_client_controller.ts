@@ -8,8 +8,6 @@ export default class CreateClientController {
   async store({ auth, request, response }: HttpContext) {
     const payload = await request.validateUsing(createClientValidator)
     const currentUser = auth.getUserOrFail()
-
-    await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
 
     const targetTenantId =

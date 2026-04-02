@@ -33,19 +33,17 @@ test.group('Auth', (group) => {
     const gyms = await Tenant.all()
     const response = await client
       .post('/api/auth/login')
-      .header('Host', `${gyms[0].slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${gyms[0].slug}.localhost:3333`)
       .json({
         email: 'test@test.com',
         password: '12345678',
       })
     response.assertStatus(200)
     const body = response.body()! as Response
-    assert.deepEqual(body, {
-      message: 'Conectado correctamente',
-      data: {
-        token: body.data.token,
-      },
-    })
+    assert.equal(body.message, 'Conectado correctamente')
+    assert.exists(body.data.token)
+    assert.exists(body.data.tenant)
+    assert.isArray(body.data.permissions)
   })
 
   test('login con credenciales incorrectas -> 401', async ({ assert, client }) => {
@@ -62,7 +60,7 @@ test.group('Auth', (group) => {
     const gyms = await Tenant.all()
     const response = await client
       .post('/api/auth/login')
-      .header('Host', `${gyms[0].slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${gyms[0].slug}.localhost:3333`)
       .json({
         email: 'test@test.com',
         password: '12345679',
@@ -90,10 +88,13 @@ test.group('Auth', (group) => {
       .create()
     await TenantFactory.merge({ slug: 'slug-falso' }).create()
 
-    const response = await client.post('/api/auth/login').header('Host', `slug-falso`).json({
-      email: 'test@test.com',
-      password: '12345678',
-    })
+    const response = await client
+      .post('/api/auth/login')
+      .header('X-Tenant-Slug', `slug-falso`)
+      .json({
+        email: 'test@test.com',
+        password: '12345678',
+      })
     response.assertStatus(401)
     const bodyUser = response.body()! as ResponseError
     assert.deepEqual(bodyUser, {
@@ -117,7 +118,7 @@ test.group('Auth', (group) => {
     const gyms = await Tenant.all()
     const response = await client
       .post('/api/auth/logout')
-      .header('Host', `${gyms[0].slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${gyms[0].slug}.localhost:3333`)
       .loginAs(user)
     response.assertStatus(200)
     const body = response.body()! as Response

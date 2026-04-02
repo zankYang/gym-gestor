@@ -1,12 +1,19 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Tenant from '#models/tenant'
+import { RoleCode } from '#enums/role_enum'
 
 export default class DestroyTenantController {
   /**
    * Borrado lógico de un tenant por id. Solo superadmin.
    * El registro permanece en BD con deleted_at; deja de aparecer en listados.
    */
-  async destroy({ params, response }: HttpContext) {
+  async destroy({ consumer, params, response }: HttpContext) {
+    if (consumer.role.code !== RoleCode.SUPERADMIN) {
+      return response.status(403).send({
+        errors: [{ message: 'No tienes los permisos necesarios para realizar esta acción' }],
+      })
+    }
+
     const tenant = await Tenant.notDeleted().where('id', params.id).first()
     if (!tenant) {
       return response.status(404).send({

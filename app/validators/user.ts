@@ -10,6 +10,7 @@ const roleEnum = () => vine.string().in([RoleCode.ADMIN, RoleCode.RECEPTIONIST, 
 const statusEnum = () => vine.string().in([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED])
 const avatarUrl = () => vine.string().url().maxLength(255)
 const tenantId = () => vine.number().exists({ table: 'tenants', column: 'id' })
+const phoneNumber = () => vine.string().minLength(10).maxLength(15)
 /**
  * Validator para crear un usuario (admin/superadmin).
  * El email se valida como único por tenant en el controlador.
@@ -19,6 +20,7 @@ export const createUserValidator = vine.create({
   avatarUrl: avatarUrl().optional(),
   firstName: firstName(),
   lastName: lastName(),
+  phone: phoneNumber(),
   email: email(),
   password: password(),
   role: roleEnum(),
@@ -41,6 +43,7 @@ export const updateUserValidator = vine.create({
   lastName: lastName().optional(),
   avatarUrl: avatarUrl().optional(),
   email: email().optional(),
+  phone: phoneNumber().optional(),
   password: password().optional(),
   role: roleEnum().optional(),
   status: statusEnum().optional(),
@@ -53,7 +56,9 @@ export const updateUserValidator = vine.create({
  * SUPERADMIN), para mantener compatibilidad cuando el filtro se ignora.
  */
 const roleFilterEnum = () =>
-  vine.string().in([RoleCode.SUPERADMIN, RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH])
+  vine
+    .string()
+    .in([RoleCode.ADMIN, RoleCode.RECEPTIONIST, RoleCode.COACH, RoleCode.MEMBER, RoleCode.GUEST])
 
 export const listUsersQueryValidator = vine.create({
   page: vine.number().optional(),

@@ -1,20 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+import Role from '#models/role'
 import { updateUserValidator } from '#validators/user'
 import { RoleCode } from '#enums/role_enum'
 
 export default class UpdateUserController {
-  async update({ auth, params, request, response }: HttpContext) {
-    const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
-    const currentRole = (currentUser.role as any).code as string
-
+  async update({ consumer, params, request, response }: HttpContext) {
     const payload = await request.validateUsing(updateUserValidator)
+    const { role: roleCode, password, ...rest } = payload
 
     let query = User.notDeleted().where('id', params.id)
 
-    if (currentRole !== RoleCode.SUPERADMIN) {
-      query = query.where('tenant_id', currentUser.tenantId)
+    if (consumer.role.code !== RoleCode.SUPERADMIN) {
+      query = query.where('tenant_id', consumer.tenantId)
     }
 
     const user = await query.first()
@@ -24,7 +22,15 @@ export default class UpdateUserController {
       })
     }
 
-    user.merge(payload)
+    user.merge(rest)
+    if (password !== undefined) {
+      user.passwordHash = password
+    }
+    if (roleCode !== undefined) {
+      const roleRecord = await Role.findByOrFail('code', roleCode)
+      user.roleId = roleRecord.id
+    }
+
     await user.save()
 
     return response.status(200).send({

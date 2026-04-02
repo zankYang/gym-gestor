@@ -3,7 +3,6 @@ import Tenant from '#models/tenant'
 import User from '#models/user'
 import { RoleCode } from '#enums/role_enum'
 import { Status } from '#enums/status_enum'
-import hash from '@adonisjs/core/services/hash'
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class UserSeeder extends BaseSeeder {
@@ -39,7 +38,7 @@ export default class UserSeeder extends BaseSeeder {
           {
             tenantId: tenant.id,
             email: user.email,
-            passwordHash: await hash.make(user.password),
+            passwordHash: user.password,
             roleId: user.roleId,
             firstName: user.email.split('.')[0],
             lastName: 'Gymgestor',

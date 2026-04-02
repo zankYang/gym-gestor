@@ -10,7 +10,7 @@ declare module '@adonisjs/core/http' {
 
 export default class IdentifyTenantMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
-    const hostname = ctx.request.hostname()
+    const hostname = ctx.request.header('X-Tenant-Slug')
 
     if (!hostname) {
       return ctx.response.badRequest({
@@ -22,7 +22,7 @@ export default class IdentifyTenantMiddleware {
 
     if (!tenant) {
       return ctx.response.notFound({
-        errors: [{ message: 'Plataforma no válida' }],
+        errors: [{ message: 'Plataforma no válida', tenant: hostname }],
       })
     }
 

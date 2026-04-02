@@ -10,8 +10,21 @@ export const controllers = {
     ListTenants: () => import('#controllers/admin/list_tenants_controller'),
     UpdateTenant: () => import('#controllers/admin/update_tenant_controller'),
   },
+  attendance: {
+    CheckinAttendance: () => import('#controllers/attendance/checkin_attendance_controller'),
+    CheckoutAttendance: () => import('#controllers/attendance/checkout_attendance_controller'),
+    CreateAttendance: () => import('#controllers/attendance/create_attendance_controller'),
+    DestroyAttendance: () => import('#controllers/attendance/destroy_attendance_controller'),
+    ListAttendances: () => import('#controllers/attendance/list_attendances_controller'),
+    ShowAttendance: () => import('#controllers/attendance/show_attendance_controller'),
+    UpdateAttendance: () => import('#controllers/attendance/update_attendance_controller'),
+  },
   auth: {
     AccessToken: () => import('#controllers/auth/access_token_controller'),
+    catalog: {
+      CatalogsRole: () => import('#controllers/auth/catalog/catalogs_role_controller'),
+    },
+    Permissions: () => import('#controllers/auth/permissions_controller'),
   },
   client: {
     CreateClient: () => import('#controllers/client/create_client_controller'),
@@ -19,6 +32,27 @@ export const controllers = {
     ListClients: () => import('#controllers/client/list_clients_controller'),
     ShowClient: () => import('#controllers/client/show_client_controller'),
     UpdateClient: () => import('#controllers/client/update_client_controller'),
+  },
+  membership: {
+    CreateMembership: () => import('#controllers/membership/create_membership_controller'),
+    DestroyMembership: () => import('#controllers/membership/destroy_membership_controller'),
+    ListMemberships: () => import('#controllers/membership/list_memberships_controller'),
+    ShowMembership: () => import('#controllers/membership/show_membership_controller'),
+    UpdateMembership: () => import('#controllers/membership/update_membership_controller'),
+  },
+  payment: {
+    CancelPayment: () => import('#controllers/payment/cancel_payment_controller'),
+    CreatePayment: () => import('#controllers/payment/create_payment_controller'),
+    ListPayments: () => import('#controllers/payment/list_payments_controller'),
+    ShowPayment: () => import('#controllers/payment/show_payment_controller'),
+    UpdatePayment: () => import('#controllers/payment/update_payment_controller'),
+  },
+  plan: {
+    CreatePlan: () => import('#controllers/plan/create_plan_controller'),
+    DestroyPlan: () => import('#controllers/plan/destroy_plan_controller'),
+    ListPlans: () => import('#controllers/plan/list_plans_controller'),
+    ShowPlan: () => import('#controllers/plan/show_plan_controller'),
+    UpdatePlan: () => import('#controllers/plan/update_plan_controller'),
   },
   user: {
     CreateUser: () => import('#controllers/user/create_user_controller'),

@@ -60,10 +60,11 @@ test.group('User / List – autorización y filtros', (group) => {
 
     const response = await client
       .get(`/api/users?tenantId=${tenantB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
+
     const body = response.body()! as Response
     assert.equal(body.message, 'Usuarios listados correctamente')
     assert.isArray(body.data)
@@ -90,7 +91,7 @@ test.group('User / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/users')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -103,7 +104,9 @@ test.group('User / List – autorización y filtros', (group) => {
 
   test('listar usuarios sin autenticación -> 401', async ({ client, assert }) => {
     const tenant = await TenantFactory.create()
-    const response = await client.get('/api/users').header('Host', `${tenant.slug}.localhost:3333`)
+    const response = await client
+      .get('/api/users')
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError
@@ -117,13 +120,12 @@ test.group('User / List – autorización y filtros', (group) => {
     assert,
   }) => {
     const tenant = await TenantFactory.create()
-    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
     const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
     const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
 
-    const superadminUser = await UserFactory.merge({
+    const adminUser = await UserFactory.merge({
       tenantId: tenant.id,
-      roleId: superadminRole.id,
+      roleId: adminRole.id,
     }).create()
 
     await UserFactory.merge({
@@ -147,8 +149,8 @@ test.group('User / List – autorización y filtros', (group) => {
       .get(
         '/api/users?q=Juan&role=admin&status=Activo&page=1&perPage=5&sortBy=created_at&sortDir=asc'
       )
-      .header('Host', `${tenant.slug}.localhost:3333`)
-      .loginAs(superadminUser)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
+      .loginAs(adminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
@@ -156,7 +158,7 @@ test.group('User / List – autorización y filtros', (group) => {
     assert.isArray(body.data)
     assert.isTrue(
       (body.data as { firstName: string }[]).every((u) =>
-        ['Juan', superadminUser.firstName].includes(u.firstName)
+        ['Juan', adminUser.firstName].includes(u.firstName)
       )
     )
   })
@@ -172,7 +174,7 @@ test.group('User / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/users?page=abc')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(422)
@@ -191,7 +193,7 @@ test.group('User / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/users?sortDir=NOPE')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(422)
@@ -210,7 +212,7 @@ test.group('User / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/users?status=NoExiste')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(422)
@@ -235,8 +237,8 @@ test.group('User / List – autorización y filtros', (group) => {
     await UserFactory.merge({ tenantId: tenantB.id, roleId: adminRole.id }).create()
 
     const response = await client
-      .get('/api/users?tenantId=abc')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .get('/api/users?tenantId=123')
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -269,7 +271,7 @@ test.group('User / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
@@ -297,7 +299,7 @@ test.group('User / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/users/${otherUser.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -326,7 +328,7 @@ test.group('User / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
@@ -340,7 +342,7 @@ test.group('User / Show – autorización y tenant', (group) => {
     const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
     const response = await client
       .get(`/api/users/${user.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError
@@ -368,13 +370,14 @@ test.group('User / Create – validaciones y permisos', (group) => {
       firstName: 'Nuevo',
       lastName: 'Usuario',
       email: 'nuevo@tenantb.com',
+      phone: '551234567890',
       password: 'password123',
       role: RoleCode.ADMIN,
     }
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -398,13 +401,14 @@ test.group('User / Create – validaciones y permisos', (group) => {
       firstName: 'Nuevo',
       lastName: 'Usuario',
       email: 'nuevo@mitenant.com',
+      phone: '551234567890',
       password: 'password123',
       role: RoleCode.RECEPTIONIST,
     }
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(adminUser)
 
@@ -435,13 +439,14 @@ test.group('User / Create – validaciones y permisos', (group) => {
       firstName: 'Otro',
       lastName: 'Usuario',
       email: existingUser.email,
+      phone: '551234567890',
       password: 'password123',
       role: RoleCode.ADMIN,
     }
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -477,13 +482,14 @@ test.group('User / Create – validaciones y permisos', (group) => {
       firstName: 'Otro',
       lastName: 'Usuario',
       email: 'mismo@email.com',
+      phone: '551987654321',
       password: 'password123',
       role: RoleCode.ADMIN,
     }
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -510,7 +516,7 @@ test.group('User / Create – validaciones y permisos', (group) => {
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -541,7 +547,7 @@ test.group('User / Create – validaciones y permisos', (group) => {
 
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -559,7 +565,7 @@ test.group('User / Create – validaciones y permisos', (group) => {
     const tenant = await TenantFactory.create()
     const response = await client
       .post('/api/users')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({
         firstName: 'Nuevo',
         lastName: 'Usuario',
@@ -601,7 +607,7 @@ test.group('User / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'Después' })
       .loginAs(superadminUser)
 
@@ -631,13 +637,47 @@ test.group('User / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/users/${otherUser.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Actualizado' })
       .loginAs(adminUser)
 
     response.assertStatus(200)
     const body = response.body()! as Response
     assert.equal((body.data as { firstName: string }).firstName, 'Actualizado')
+  })
+
+  test('actualizar usuario con role (código) persiste roleId correcto -> 200', async ({
+    client,
+    assert,
+  }) => {
+    const tenant = await TenantFactory.create()
+    const adminRole = await Role.findByOrFail('code', RoleCode.ADMIN)
+    const receptionistRole = await Role.findByOrFail('code', RoleCode.RECEPTIONIST)
+
+    const superadminRole = await Role.findByOrFail('code', RoleCode.SUPERADMIN)
+    const superadminUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: superadminRole.id,
+    }).create()
+
+    const targetUser = await UserFactory.merge({
+      tenantId: tenant.id,
+      roleId: adminRole.id,
+      firstName: 'RolTest',
+    }).create()
+
+    const response = await client
+      .patch(`/api/users/${targetUser.id}`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
+      .json({ role: RoleCode.RECEPTIONIST })
+      .loginAs(superadminUser)
+
+    response.assertStatus(200)
+    const body = response.body()! as Response
+    assert.equal((body.data as { roleId: number }).roleId, receptionistRole.id)
+
+    await targetUser.refresh()
+    assert.equal(targetUser.roleId, receptionistRole.id)
   })
 
   test('actualizar usuario normal intentando actualizar usuario de otro tenant -> 404', async ({
@@ -660,7 +700,7 @@ test.group('User / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'No' })
       .loginAs(adminUser)
 
@@ -686,7 +726,7 @@ test.group('User / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/users/${targetUser.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ email: 'no-es-email' })
       .loginAs(superadminUser)
 
@@ -704,7 +744,7 @@ test.group('User / Update – validaciones y tenant', (group) => {
     const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
     const response = await client
       .patch(`/api/users/${user.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Nuevo' })
 
     response.assertStatus(401)
@@ -739,7 +779,7 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
@@ -769,7 +809,7 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/users/${otherUser.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -800,7 +840,7 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/users/${userInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
@@ -819,7 +859,7 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete('/api/users/999999')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(404)
@@ -833,7 +873,7 @@ test.group('User / Destroy – soft delete y tenant', (group) => {
     const user = await UserFactory.merge({ tenantId: tenant.id, roleId: adminRole.id }).create()
     const response = await client
       .delete(`/api/users/${user.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError

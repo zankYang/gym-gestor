@@ -61,7 +61,7 @@ test.group('Client / List – autorización y filtros', (group) => {
 
     const response = await client
       .get(`/api/clients?tenantId=${tenantB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
@@ -92,7 +92,7 @@ test.group('Client / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/clients')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -107,7 +107,7 @@ test.group('Client / List – autorización y filtros', (group) => {
     const tenant = await TenantFactory.create()
     const response = await client
       .get('/api/clients')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError
@@ -127,7 +127,7 @@ test.group('Client / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/clients?page=abc')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(422)
@@ -146,7 +146,7 @@ test.group('Client / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/clients?sortDir=NOPE')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(422)
@@ -172,7 +172,7 @@ test.group('Client / List – autorización y filtros', (group) => {
 
     const response = await client
       .get('/api/clients?tenantId=abc')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -206,7 +206,7 @@ test.group('Client / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
@@ -234,7 +234,7 @@ test.group('Client / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/clients/${otherClient.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -264,7 +264,7 @@ test.group('Client / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
@@ -288,7 +288,7 @@ test.group('Client / Show – autorización y tenant', (group) => {
 
     const response = await client
       .get(`/api/clients/${clientInTenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError
@@ -323,7 +323,7 @@ test.group('Client / Create – validaciones y permisos', (group) => {
 
     const response = await client
       .post('/api/clients')
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -352,7 +352,7 @@ test.group('Client / Create – validaciones y permisos', (group) => {
 
     const response = await client
       .post('/api/clients')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(adminUser)
 
@@ -380,7 +380,7 @@ test.group('Client / Create – validaciones y permisos', (group) => {
 
     const response = await client
       .post('/api/clients')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(superadminUser)
 
@@ -396,7 +396,7 @@ test.group('Client / Create – validaciones y permisos', (group) => {
     const tenant = await TenantFactory.create()
     const response = await client
       .post('/api/clients')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({
         firstName: 'Nuevo',
         lastName: 'Cliente',
@@ -435,7 +435,7 @@ test.group('Client / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'Después' })
       .loginAs(superadminUser)
 
@@ -465,7 +465,7 @@ test.group('Client / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/clients/${otherClient.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Actualizado' })
       .loginAs(adminUser)
 
@@ -495,7 +495,7 @@ test.group('Client / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .json({ firstName: 'No' })
       .loginAs(adminUser)
 
@@ -520,7 +520,7 @@ test.group('Client / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/clients/${targetClient.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ email: 'no-es-email' })
       .loginAs(superadminUser)
 
@@ -547,7 +547,7 @@ test.group('Client / Update – validaciones y tenant', (group) => {
 
     const response = await client
       .patch(`/api/clients/${clientInTenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ firstName: 'Nuevo' })
 
     response.assertStatus(401)
@@ -582,7 +582,7 @@ test.group('Client / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(200)
@@ -612,7 +612,7 @@ test.group('Client / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/clients/${otherClient.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(200)
@@ -644,7 +644,7 @@ test.group('Client / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/clients/${clientInB.id}`)
-      .header('Host', `${tenantA.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantA.slug}.localhost:3333`)
       .loginAs(adminUser)
 
     response.assertStatus(404)
@@ -663,7 +663,7 @@ test.group('Client / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete('/api/clients/999999')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .loginAs(superadminUser)
 
     response.assertStatus(404)
@@ -687,7 +687,7 @@ test.group('Client / Destroy – soft delete y tenant', (group) => {
 
     const response = await client
       .delete(`/api/clients/${clientInTenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
 
     response.assertStatus(401)
     const body = response.body()! as ResponseError

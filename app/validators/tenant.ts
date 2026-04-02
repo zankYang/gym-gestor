@@ -12,7 +12,6 @@ export const createTenantValidator = vine.create({
   email: vine.string().nullable().optional(),
   phone: vine.string().nullable().optional(),
   address: vine.string().nullable().optional(),
-  status: vine.enum([Status.ACTIVE, Status.INACTIVE, Status.SUSPENDED]),
 })
 
 export const updateTenantValidator = vine.create({

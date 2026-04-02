@@ -6,7 +6,6 @@ import { RoleCode } from '#enums/role_enum'
 export default class UpdateClientController {
   async update({ auth, params, request, response }: HttpContext) {
     const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
 
     const payload = await request.validateUsing(updateClientValidator)

@@ -36,7 +36,7 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ name: 'Nombre Actualizado' })
       .loginAs(user)
 
@@ -65,7 +65,7 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const response = await client
       .patch(`/api/admin/tenants/${tenantB.id}`)
-      .header('Host', `${tenantB.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenantB.slug}.localhost:3333`)
       .json({ slug: tenantA.slug })
       .loginAs(user)
 
@@ -90,7 +90,7 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const response = await client
       .patch('/api/admin/tenants/999999')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ name: 'No Existe' })
       .loginAs(user)
 
@@ -108,7 +108,7 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ name: 'Sin Permiso' })
       .loginAs(user)
 
@@ -132,7 +132,7 @@ test.group('Admin / Tenant – actualizar tenant', (group) => {
 
     const response = await client
       .patch(`/api/admin/tenants/${tenant.id}`)
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({ name: 'Sin Auth' })
 
     response.assertStatus(401)

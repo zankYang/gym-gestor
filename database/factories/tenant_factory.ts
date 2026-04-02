@@ -7,7 +7,7 @@ export const TenantFactory = factory
     const name = faker.company.name()
     return {
       name,
-      slug: faker.helpers.slugify(name).toLowerCase(),
+      slug: `${faker.helpers.slugify(name).toLowerCase()}-${faker.string.alphanumeric(10)}`,
       logoUrl: faker.image.url(),
       banner: faker.image.url(),
       backgroundImageUrl: faker.image.url(),

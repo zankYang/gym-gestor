@@ -45,11 +45,25 @@ export default class SyncPermissions extends BaseCommand {
           'Permite crear, editar, desactivar y eliminar cuentas de personal (recepcionistas, entrenadores, administradores). Incluye restablecer contraseñas y modificar datos de acceso.',
       },
       {
+        code: PermissionCode.USERS_VIEW,
+        name: 'Ver Usuarios (solo lectura)',
+        module: PermissionModule.AUTH,
+        description:
+          'Permite consultar listado y detalle de usuarios del tenant sin poder crear, editar ni eliminar cuentas.',
+      },
+      {
         code: PermissionCode.ROLES_MANAGE,
         name: 'Gestionar Roles',
         module: PermissionModule.AUTH,
         description:
           'Permite asignar y cambiar el rol de cualquier usuario del tenant. Controla qué nivel de acceso tiene cada miembro del equipo dentro del sistema.',
+      },
+      {
+        code: PermissionCode.ROLES_VIEW,
+        name: 'Ver Roles',
+        module: PermissionModule.AUTH,
+        description:
+          'Permite consultar los roles disponibles y sus permisos asociados sin poder modificarlos.',
       },
 
       // --- clients ---
@@ -68,6 +82,13 @@ export default class SyncPermissions extends BaseCommand {
           'Permite registrar nuevos socios y editar sus datos personales como nombre, contacto, fecha de nacimiento, fotografía y sucursal asignada.',
       },
       {
+        code: PermissionCode.CLIENTS_VIEW,
+        name: 'Ver Socios (solo lectura)',
+        module: PermissionModule.CLIENTS,
+        description:
+          'Permite consultar listado y perfil de socios sin poder crear, editar ni eliminar registros.',
+      },
+      {
         code: PermissionCode.CLIENTS_DELETE,
         name: 'Eliminar Socios',
         module: PermissionModule.CLIENTS,
@@ -80,6 +101,13 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.CLIENTS,
         description:
           'Permite dar de alta, renovar, pausar y cancelar membresías de socios. Incluye asignar el plan contratado, fecha de inicio y vencimiento.',
+      },
+      {
+        code: PermissionCode.MEMBERSHIPS_VIEW,
+        name: 'Ver Membresías',
+        module: PermissionModule.CLIENTS,
+        description:
+          'Permite consultar el estado y el historial de membresías de los socios sin poder modificarlos.',
       },
 
       // --- finance ---
@@ -105,11 +133,25 @@ export default class SyncPermissions extends BaseCommand {
           'Permite anular o revertir un cobro ya registrado, dejando constancia del motivo. Genera el ajuste contable correspondiente en el historial del socio.',
       },
       {
+        code: PermissionCode.PAYMENTS_VIEW,
+        name: 'Ver Cobros (solo lectura)',
+        module: PermissionModule.FINANCE,
+        description:
+          'Permite consultar pagos e historial de cobros sin poder registrar ni anular movimientos.',
+      },
+      {
         code: PermissionCode.PLANS_MANAGE,
         name: 'Gestionar Planes',
         module: PermissionModule.FINANCE,
         description:
           'Permite crear, editar y desactivar los planes de membresía disponibles: nombre, precio, duración, beneficios incluidos y si admite congelamiento.',
+      },
+      {
+        code: PermissionCode.PLANS_VIEW,
+        name: 'Ver Planes',
+        module: PermissionModule.FINANCE,
+        description:
+          'Permite consultar el catálogo de planes de membresía (precios, duración y beneficios) sin poder crearlos ni modificarlos.',
       },
 
       // --- operations ---
@@ -119,6 +161,27 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.OPERATIONS,
         description:
           'Permite registrar la entrada y salida de socios en la sucursal, ya sea mediante búsqueda manual, escaneo de QR o código de membresía.',
+      },
+      {
+        code: PermissionCode.ATTENDANCES_MANAGE,
+        name: 'Gestionar Asistencias',
+        module: PermissionModule.OPERATIONS,
+        description:
+          'Permite crear y editar asistencias de forma manual, incluyendo ajustes operativos en registros del día.',
+      },
+      {
+        code: PermissionCode.ATTENDANCES_CHECKOUT,
+        name: 'Registrar Checkout',
+        module: PermissionModule.OPERATIONS,
+        description:
+          'Permite cerrar una asistencia abierta registrando la salida del socio y su trazabilidad.',
+      },
+      {
+        code: PermissionCode.ATTENDANCES_DELETE,
+        name: 'Eliminar Asistencias',
+        module: PermissionModule.OPERATIONS,
+        description:
+          'Permite dar de baja lógica un registro de asistencia cuando corresponda por corrección operativa.',
       },
       {
         code: PermissionCode.ATTENDANCES_VIEW,
@@ -134,6 +197,13 @@ export default class SyncPermissions extends BaseCommand {
         description:
           'Permite crear y configurar sucursales del gimnasio: nombre, dirección, horarios de atención, capacidad máxima y personal asignado.',
       },
+      {
+        code: PermissionCode.BRANCH_VIEW,
+        name: 'Ver Sucursales',
+        module: PermissionModule.OPERATIONS,
+        description:
+          'Permite consultar datos de sucursales y su configuración sin poder crear ni modificarlas.',
+      },
 
       // --- fitness ---
       {
@@ -144,11 +214,25 @@ export default class SyncPermissions extends BaseCommand {
           'Permite crear y administrar clases grupales: nombre, descripción, horario, cupo máximo, entrenador a cargo y sucursal donde se imparte.',
       },
       {
+        code: PermissionCode.CLASSES_VIEW,
+        name: 'Ver Clases',
+        module: PermissionModule.FITNESS,
+        description:
+          'Permite consultar horarios, cupos y detalle de clases grupales sin poder administrarlas.',
+      },
+      {
         code: PermissionCode.TRAINERS_MANAGE,
         name: 'Gestionar Entrenadores',
         module: PermissionModule.FITNESS,
         description:
           'Permite registrar entrenadores, asignarlos a clases o socios, y gestionar su disponibilidad horaria y especialidades dentro del gimnasio.',
+      },
+      {
+        code: PermissionCode.TRAINERS_VIEW,
+        name: 'Ver Entrenadores',
+        module: PermissionModule.FITNESS,
+        description:
+          'Permite consultar el listado y perfiles de entrenadores sin poder modificarlos.',
       },
 
       // --- workout ---
@@ -158,6 +242,13 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.WORKOUT,
         description:
           'Permite crear rutinas de entrenamiento personalizadas y asignarlas a socios específicos. Incluye definir días, series, repeticiones y ejercicios del catálogo.',
+      },
+      {
+        code: PermissionCode.ROUTINES_VIEW,
+        name: 'Ver Rutinas',
+        module: PermissionModule.WORKOUT,
+        description:
+          'Permite consultar rutinas asignadas y su contenido sin poder crear ni editarlas.',
       },
       {
         code: PermissionCode.CATALOG_MANAGE,
@@ -223,6 +314,13 @@ export default class SyncPermissions extends BaseCommand {
         module: PermissionModule.SYSTEM,
         description:
           'Permite dar de baja o eliminar permanentemente un tenant de la plataforma, junto con todos sus datos asociados. Acción irreversible exclusiva de superadmin.',
+      },
+      {
+        code: PermissionCode.TENANTS_VIEW,
+        name: 'Ver Tenants (solo lectura)',
+        module: PermissionModule.SYSTEM,
+        description:
+          'Permite consultar listado y detalle de tenants sin poder crearlos, editarlos ni eliminarlos.',
       },
     ]
 

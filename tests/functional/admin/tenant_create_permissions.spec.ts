@@ -50,13 +50,13 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     const response = await client
       .post('/api/admin/tenants')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(user)
 
     response.assertStatus(201)
 
-    const body = response.body() as Response
+    const body = response.body()! as Response
 
     assert.equal(body.message, 'Tenant creado correctamente')
     assert.equal(body.data.name, payload.name)
@@ -97,13 +97,13 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     const response = await client
       .post('/api/admin/tenants')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json(payload)
       .loginAs(user)
 
     response.assertStatus(201)
 
-    const body = response.body() as Response
+    const body = response.body()! as Response
 
     assert.equal(body.message, 'Tenant creado correctamente')
     assert.equal(body.data.name, payload.name)
@@ -146,13 +146,13 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     const response = await client
       .post('/api/admin/tenants')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({})
       .loginAs(user)
 
     response.assertStatus(422)
 
-    const body = response.body() as ResponseError
+    const body = response.body()! as ResponseError
 
     assert.deepEqual(body.errors, [
       {
@@ -163,11 +163,6 @@ test.group('Admin / Tenant – crear tenant', (group) => {
       {
         field: 'slug',
         message: 'Slug es obligatorio',
-        rule: 'required',
-      },
-      {
-        field: 'status',
-        message: 'Estado es obligatorio',
         rule: 'required',
       },
     ])
@@ -184,7 +179,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     const response = await client
       .post('/api/admin/tenants')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({
         name: 'Gym Bloqueado',
         slug: 'gym-bloqueado',
@@ -194,7 +189,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     response.assertStatus(403)
 
-    const body = response.body() as ResponseError
+    const body = response.body()! as ResponseError
     assert.deepEqual(body, {
       errors: [
         {
@@ -212,7 +207,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     const response = await client
       .post('/api/admin/tenants')
-      .header('Host', `${tenant.slug}.localhost:3333`)
+      .header('X-Tenant-Slug', `${tenant.slug}.localhost:3333`)
       .json({
         name: 'Gym No Auth',
         slug: 'gym-no-auth',
@@ -221,7 +216,7 @@ test.group('Admin / Tenant – crear tenant', (group) => {
 
     response.assertStatus(401)
 
-    const body = response.body() as ResponseError
+    const body = response.body()! as ResponseError
     assert.deepEqual(body, {
       errors: [
         {

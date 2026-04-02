@@ -4,23 +4,11 @@ import { RoleCode } from '#enums/role_enum'
 import { listUsersQueryValidator, tenantIdQueryValidator } from '#validators/user'
 
 export default class ListUsersController {
-  async index({ auth, response, request }: HttpContext) {
-    const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
-    const currentRole = currentUser.role.code
-
-    // tenantId solo se valida si el rol es SUPERADMIN.
-    // En otros roles el filtro es ignorado (compatibilidad).
-    let requestedTenantId: number | undefined
-    if (currentRole === RoleCode.SUPERADMIN) {
-      const { tenantId } = await request.validateUsing(tenantIdQueryValidator)
-      requestedTenantId = tenantId !== undefined ? Number(tenantId) : undefined
-    }
-
-    const targetTenantId =
-      currentRole === RoleCode.SUPERADMIN ? requestedTenantId : currentUser.tenantId
-
+  async index({ consumer, response, request }: HttpContext) {
+    const { tenantId } = await request.validateUsing(tenantIdQueryValidator)
     const filters = await request.validateUsing(listUsersQueryValidator)
+
+    const targetTenantId = consumer.role.code === RoleCode.SUPERADMIN ? tenantId : consumer.tenantId
 
     const page = Math.max(1, Number(filters.page ?? 1))
     const perPage = Math.min(100, Math.max(1, Number(filters.perPage ?? 10)))
@@ -28,9 +16,15 @@ export default class ListUsersController {
     const roleFilter = filters.role as string | undefined
     const statusFilter = filters.status as string | undefined
     const sortBy = (filters.sortBy ?? 'created_at').toString()
-    const sortDir = (filters.sortDir ?? 'desc') as 'asc' | 'desc'
+    const sortDir = (filters.sortDir ?? 'asc') as 'asc' | 'desc'
 
-    const query = User.notDeleted()
+    const query = User.notDeleted().preload('role', (builder) => {
+      builder.select(['id', 'name', 'code'])
+    })
+
+    query.whereHas('role', (builder) => {
+      builder.whereNot('code', RoleCode.SUPERADMIN)
+    })
 
     if (targetTenantId !== undefined) {
       query.where('tenant_id', targetTenantId)

@@ -5,7 +5,6 @@ import { RoleCode } from '#enums/role_enum'
 export default class ShowClientController {
   async show({ auth, params, response }: HttpContext) {
     const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
 
     const query = Client.notDeleted().where('id', params.id)

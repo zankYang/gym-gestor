@@ -7,6 +7,45 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AttendanceEventSchema extends BaseModel {
+  static $columns = [
+    'id',
+    'tenantId',
+    'attendanceId',
+    'clientId',
+    'eventType',
+    'eventAt',
+    'registeredBy',
+    'notes',
+    'metadata',
+    'createdAt',
+    'updatedAt',
+  ] as const
+  $columns = AttendanceEventSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare tenantId: number
+  @column()
+  declare attendanceId: number
+  @column()
+  declare clientId: number
+  @column()
+  declare eventType: string
+  @column.dateTime()
+  declare eventAt: DateTime
+  @column()
+  declare registeredBy: number
+  @column()
+  declare notes: string | null
+  @column()
+  declare metadata: any | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class AttendanceSchema extends BaseModel {
   static $columns = [
     'id',
@@ -345,15 +384,18 @@ export class ClientSchema extends BaseModel {
     'id',
     'tenantId',
     'branchId',
+    'avatarUrl',
     'firstName',
     'lastName',
+    'gender',
     'email',
     'phone',
     'birthDate',
-    'gender',
+    'height',
+    'weight',
+    'medicalNotes',
     'emergencyContactName',
     'emergencyContactPhone',
-    'medicalNotes',
     'notes',
     'status',
     'joinedAt',
@@ -371,9 +413,13 @@ export class ClientSchema extends BaseModel {
   @column()
   declare branchId: number | null
   @column()
+  declare avatarUrl: string | null
+  @column()
   declare firstName: string
   @column()
   declare lastName: string
+  @column()
+  declare gender: string | null
   @column()
   declare email: string | null
   @column()
@@ -381,13 +427,15 @@ export class ClientSchema extends BaseModel {
   @column.date()
   declare birthDate: DateTime | null
   @column()
-  declare gender: string | null
+  declare height: string | null
+  @column()
+  declare weight: string | null
+  @column()
+  declare medicalNotes: string | null
   @column()
   declare emergencyContactName: string | null
   @column()
   declare emergencyContactPhone: string | null
-  @column()
-  declare medicalNotes: string | null
   @column()
   declare notes: string | null
   @column()

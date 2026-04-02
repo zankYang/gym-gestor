@@ -6,11 +6,8 @@ import { listClientsQueryValidator, tenantIdQueryValidator } from '#validators/c
 export default class ListClientsController {
   async index({ auth, response, request }: HttpContext) {
     const currentUser = auth.getUserOrFail()
-    await currentUser.load((preloader) => preloader.load('role'))
     const currentRole = currentUser.role.code
 
-    // tenantId solo se valida si el rol es SUPERADMIN.
-    // En otros roles el filtro es ignorado (compatibilidad).
     let requestedTenantId: number | undefined
     if (currentRole === RoleCode.SUPERADMIN) {
       const { tenantId } = await request.validateUsing(tenantIdQueryValidator)
@@ -26,13 +23,18 @@ export default class ListClientsController {
     const perPage = Math.min(100, Math.max(1, Number(filters.perPage ?? 10)))
 
     const q = (filters.q ?? '').toString().trim()
+    const statusFilter = filters.status as string | undefined
     const sortBy = (filters.sortBy ?? 'created_at').toString()
-    const sortDir = (filters.sortDir ?? 'desc') as 'asc' | 'desc'
+    const sortDir = (filters.sortDir ?? 'asc') as 'asc' | 'desc'
 
     const query = Client.notDeleted()
 
     if (targetTenantId !== undefined) {
       query.where('tenant_id', targetTenantId)
+    }
+
+    if (statusFilter) {
+      query.where('status', statusFilter)
     }
 
     if (q) {

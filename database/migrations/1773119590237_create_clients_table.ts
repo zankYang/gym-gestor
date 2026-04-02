@@ -24,6 +24,7 @@ export default class extends BaseSchema {
         .onDelete('SET NULL')
         .onUpdate('CASCADE')
 
+      table.string('avatar_url', 255).nullable()
       table.string('first_name', 100).notNullable()
       table.string('last_name', 100).notNullable()
       table.string('gender', 30).nullable()

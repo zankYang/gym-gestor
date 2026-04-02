@@ -8,6 +8,7 @@ export const ClientFactory = factory
     return {
       tenantId: 1,
       branchId: null,
+      avatarUrl: faker.image.url(),
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       email: faker.internet.email(),
